@@ -1,5 +1,6 @@
 package main;
 
+import controllers.MovingSpriteController;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -8,11 +9,9 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Spinner;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 
-import java.security.Key;
 import java.util.HashMap;
 
 public class Main extends Application {
@@ -20,22 +19,27 @@ public class Main extends Application {
     private double WINDOW_WIDTH = 1600d;
     private double WINDOW_HEIGHT = 1000d;
 
+    private double GAME_WIDTH = WINDOW_WIDTH;
+    private double GAME_HEIGHT = WINDOW_HEIGHT * 3d;
+
     private Scene startMenuScene;
     private Scene gameScene;
 
     private GraphicsContext gameGraphics;
     private AnimationTimer timer;
+    private double delta = 1d;
 
     private int ticks = 0;
 
     private SpriteFX background;
 
     private MovingSpriteFX player;
-    private Sprite playerBounds;
+
+    private MovingSpriteController mines;
 
     private HashMap<KeyCode, Boolean> keys = new HashMap<KeyCode, Boolean>();
 
-    private void initWindow() throws Exception {
+    private void initScenes() throws Exception {
 
         // Menu Scene
         Parent menuRoot = FXMLLoader.load(getClass().getResource("/views/mainMenu.fxml"));
@@ -61,10 +65,17 @@ public class Main extends Application {
     private void initPlayer() {
         double width = 60;
         double height = 30;
-        playerBounds = new Sprite(0, 0, WINDOW_WIDTH - width, WINDOW_HEIGHT - height);
         player = new MovingSpriteFX(WINDOW_WIDTH / 2 - width / 2, WINDOW_HEIGHT / 2 - height / 2, width, height);
         player.setImgUrl("/img/sprites/sub.png");
-        player.drawGraphics(gameGraphics);
+    }
+
+    private void initMines() {
+        mines = new MovingSpriteController(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+        MovingSpriteFX mine = new MovingSpriteFX(0, 0, 40, 40);
+        mine.setImgUrl("/img/sprites/mine.png");
+        mine.setyVelocityLimit(1d);
+        mine.transformVelocityY(0.02d);
+        mines.add(mine);
     }
 
     /**
@@ -86,6 +97,8 @@ public class Main extends Application {
                 timer += now - lastUpdate;
                 lastUpdate = now;
 
+                delta = deltaT;
+
                 if (deltaT >= 1) {
 
                     update();
@@ -97,7 +110,7 @@ public class Main extends Application {
                 }
 
                 if (timer >= 1_000_000_000L) {
-                    System.out.println("Ticks and Frames: " + ticks);
+                    printInfo();
                     ticks = 0;
                     timer = 0L;
                 }
@@ -111,26 +124,30 @@ public class Main extends Application {
         gameScene.setOnKeyReleased(keyEvent -> keys.put(keyEvent.getCode(), false));
 
         movePlayer();
-
-        player.transformPos();
+        player.transformPos(delta);
+        mines.updateAllPos(delta);
     }
 
     public void render() {
         background.drawGraphics(gameGraphics);
         player.drawGraphics(gameGraphics);
+        mines.render(gameGraphics);
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        initWindow();
+        primaryStage.setTitle("Submariner");
 
-        primaryStage.setTitle("Hello World");
+        initScenes();
+
         primaryStage.setScene(gameScene);
         primaryStage.show();
 
         initBackground();
 
         initPlayer();
+
+        initMines();
 
         initAnimation();
     }
@@ -141,6 +158,9 @@ public class Main extends Application {
 
     public Boolean isPressed(KeyCode key) {
         return keys.getOrDefault(key, false);
+    }
+
+    public void moveCamera() {
     }
 
     public void movePlayer() {
@@ -157,5 +177,10 @@ public class Main extends Application {
         if (isPressed(KeyCode.D)) {
             player.transformVelocityX(acceleration);
         }
+    }
+
+    public void printInfo() {
+        System.out.println("Ticks and Frames: " + ticks);
+        mines.print("Mines: ");
     }
 }

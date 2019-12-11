@@ -8,8 +8,8 @@ public class MovingSpriteFX extends SpriteFX {
     private double yVelocity = 0d;
     private double xSpeedModifier = 1d;
     private double ySpeedModifier = 1d;
-    private double xVelocityLimit = 1d;
-    private double yVelocityLimit = 1d;
+    private double xVelocityLimit = 2d;
+    private double yVelocityLimit = 2d;
 
     public MovingSpriteFX(double startX, double startY, double width, double height) {
         super(startX, startY, width, height);
@@ -19,61 +19,61 @@ public class MovingSpriteFX extends SpriteFX {
         return xVelocity;
     }
 
-    public void setVelocityX(double xVelocity) {
-        this.xVelocity = xVelocity;
+    public void setVelocityX(double value) {
+        this.xVelocity = value;
     }
 
     public double getVelocityY() {
         return yVelocity;
     }
 
-    public void setVelocityY(double yVelocity) {
-        this.yVelocity = yVelocity;
+    public void setVelocityY(double value) {
+        this.yVelocity = value;
     }
 
     public double getSpeedModifierX() {
         return xSpeedModifier;
     }
 
-    public void setxSpeedModifier(double xSpeedModifier) {
-        this.xSpeedModifier = xSpeedModifier;
+    public void setxSpeedModifier(double value) {
+        this.xSpeedModifier = value;
     }
 
     public double getSpeedModifierY() {
         return ySpeedModifier;
     }
 
-    public void setySpeedModifier(double ySpeedModifier) {
-        this.ySpeedModifier = ySpeedModifier;
+    public void setySpeedModifier(double value) {
+        this.ySpeedModifier = value;
     }
 
     public double getVelocityXLimit() {
         return xVelocityLimit;
     }
 
-    public void setxVelocityLimit(double xVelocityLimit) {
-        this.xVelocityLimit = xVelocityLimit;
+    public void setxVelocityLimit(double value) {
+        this.xVelocityLimit = value;
     }
 
     public double getVelocityYLimit() {
         return yVelocityLimit;
     }
 
-    public void setyVelocityLimit(double yVelocityLimit) {
-        this.yVelocityLimit = yVelocityLimit;
+    public void setyVelocityLimit(double value) {
+        this.yVelocityLimit = value;
     }
 
-    public void transformX() {
-        setStartX(getStartX() + getSpeedModifierX() * getVelocityX());
+    public void transformX(double delta) {
+        setStartX(getStartX() + delta * getSpeedModifierX() * getVelocityX());
     }
 
-    public void transformY() {
-        setStartY(getStartY() + getVelocityY() * getSpeedModifierY());
+    public void transformY(double delta) {
+        setStartY(getStartY() + delta * getVelocityY() * getSpeedModifierY());
     }
 
-    public void transformPos() {
-        transformX();
-        transformY();
+    public void transformPos(double delta) {
+        transformX(delta);
+        transformY(delta);
     }
 
     public void transformVelocityX(double value) {
@@ -82,6 +82,17 @@ public class MovingSpriteFX extends SpriteFX {
 
     public void transformVelocityY(double value) {
         setVelocityY(transformVelocity(value, getVelocityY(), getVelocityYLimit()));
+    }
+
+    @Override
+    public void drawGraphics(GraphicsContext gc) {
+        double xOffset = getStartX();
+        double widthOffset = getWidth();
+        if (getVelocityX() < 0) {
+            xOffset += widthOffset;
+            widthOffset = -widthOffset;
+        }
+        gc.drawImage(getImage(), xOffset, getStartY(), widthOffset, getHeight());
     }
 
     private double transformVelocity(double value, double current, double limit) {
@@ -95,8 +106,11 @@ public class MovingSpriteFX extends SpriteFX {
         }
     }
 
-    @Override
-    public void drawGraphics(GraphicsContext gc) {
-        gc.drawImage(getImage(), getStartX(), getStartY(), getWidth(), getHeight());
+    public String toString() {
+        return "sX: " + getStartX() + " sY: " + getStartY() + " eX: " + getEndX() + " eY: " + getEndY();
+    }
+
+    public void print(String msg) {
+        System.out.println(msg + toString());
     }
 }
