@@ -1,0 +1,15 @@
+#layout {
+    -fx-background-image: url("../img/backgrounds/ocean.jpg");
+    -fx-background-repeat: stretch;
+    -fx-background-position: center center;
+    -fx-background-size: 1200 800;
+}
+
+#menuPanel {
+    -fx-background-color: white;
+}
+
+.menuBtn {
+    -fx-background-color: white;
+    -fx-text-fill: blue;
+}
