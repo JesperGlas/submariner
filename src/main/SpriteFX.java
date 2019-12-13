@@ -7,8 +7,8 @@ public class SpriteFX extends Sprite {
 
     private Image img = new Image(String.valueOf(getClass().getResource(getImgUrl())));
 
-    public SpriteFX(double startX, double startY, double width, double height) {
-        super(startX, startY, width, height);
+    public SpriteFX(double x, double y, double width, double height) {
+        super(x, y, width, height);
     }
 
     @Override

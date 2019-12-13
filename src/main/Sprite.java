@@ -2,42 +2,58 @@ package main;
 
 public class Sprite {
 
-    private double startX;
-    private double startY;
+    private double centerX;
+    private double centerY;
     private double width;
     private double height;
 
     private String imgUrl = "/img/error.png";
 
-    public Sprite(double startX, double startY, double width, double height) {
-        this.startX = startX;
-        this.startY = startY;
+    public Sprite(double xPos, double yPos, double width, double height) {
+        this.centerX = xPos;
+        this.centerY = yPos;
         this.width = width;
         this.height = height;
     }
 
+    public double getCenterX() {
+        return centerX;
+    }
+
+    public void setCenterX(double centerX) {
+        this.centerX = centerX;
+    }
+
+    public double getCenterY() {
+        return centerY;
+    }
+
+    public void setCenterY(double centerY) {
+        this.centerY = centerY;
+    }
+
     public double getStartX() {
-        return startX;
+        return this.centerX - this.width / 2d;
     }
 
     public void setStartX(double x) {
-        this.startX = x;
+        this.centerX = x + this.width / 2d;
     }
 
     public double getStartY() {
-        return startY;
+        return this.centerY - this.height / 2d;
     }
 
     public void setStartY(double y) {
-        this.startY = y;
+        this.centerY = y + this.height / 2d;
     }
 
     public double getEndX() {
-        return this.startX + this.width;
+        return this.centerX + this.width / 2d;
     }
 
     public double getEndY() {
-        return this.startY + this.height;
+        return this.centerY + this.height / 2d;
     }
 
     public double getWidth() {

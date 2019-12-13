@@ -21,7 +21,7 @@ public class Main extends Application {
     private double WINDOW_HEIGHT = 1000d;
 
     private double GAME_WIDTH = WINDOW_WIDTH;
-    private double GAME_HEIGHT = WINDOW_HEIGHT * 3d;
+    private double GAME_HEIGHT = WINDOW_HEIGHT;
 
     private Scene startMenuScene;
     private Scene gameScene;
@@ -59,7 +59,7 @@ public class Main extends Application {
     }
 
     public void initBackground() {
-        background = new SpriteFX(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+        background = new SpriteFX(GAME_WIDTH / 2d, GAME_HEIGHT / 2d, GAME_WIDTH, GAME_HEIGHT);
         background.setImgUrl("/img/backgrounds/ocean.jpg");
         background.drawGraphics(gameGraphics);
     }
@@ -67,21 +67,23 @@ public class Main extends Application {
     private void initPlayer() {
         double width = 60;
         double height = 30;
-        player = new MovingSpriteFX(WINDOW_WIDTH / 2 - width / 2, WINDOW_HEIGHT / 2 - height / 2, width, height);
+        player = new MovingSpriteFX(WINDOW_WIDTH / 2d, WINDOW_HEIGHT / 2d, width, height);
+        player.setVelocityLimitX(2d);
+        player.setVelocityLimitY(2d);
         player.setImgUrl("/img/sprites/sub.png");
     }
 
     private void initMines() {
-        mines = new MovingSpriteController(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-        MovingSpriteFX mine = new MovingSpriteFX(0, 0, 40, 40);
+        mines = new MovingSpriteController(0, 0, GAME_WIDTH, GAME_HEIGHT);
+        MovingSpriteFX mine = new MovingSpriteFX(20, 20, 40, 40);
         mine.setImgUrl("/img/sprites/mine.png");
         mine.setVelocityY(1d);
         mines.add(mine);
     }
 
     private void initTorpedoes() {
-        torpedoes = new MovingSpriteController(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-        MovingSpriteFX torpedo = new MovingSpriteFX(0, 20, 30, 15);
+        torpedoes = new MovingSpriteController(0, 0, GAME_WIDTH, GAME_HEIGHT);
+        MovingSpriteFX torpedo = new MovingSpriteFX(15, 20, 30, 15);
         torpedo.setImgUrl("/img/sprites/torpedo.png");
         torpedo.setVelocityX(2d);
         MovingSpriteFX torpedo2 = new MovingSpriteFX(WINDOW_WIDTH - 30, 50, 30, 15);
@@ -128,16 +130,20 @@ public class Main extends Application {
     }
 
     public void movePlayer() {
-        double acceleration = 0.02d;
+        double acceleration = 0.05d;
+
         if (isPressed(KeyCode.W)) {
             player.transformVelocityY((-1d) * acceleration);
         }
+
         if (isPressed(KeyCode.S)) {
             player.transformVelocityY(acceleration);
         }
+
         if (isPressed(KeyCode.A)) {
             player.transformVelocityX((-1d) * acceleration);
         }
+
         if (isPressed(KeyCode.D)) {
             player.transformVelocityX(acceleration);
         }

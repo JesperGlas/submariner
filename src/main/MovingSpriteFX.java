@@ -11,8 +11,8 @@ public class MovingSpriteFX extends SpriteFX {
     private double xVelocityLimit = 1d;
     private double yVelocityLimit = 1d;
 
-    public MovingSpriteFX(double startX, double startY, double width, double height) {
-        super(startX, startY, width, height);
+    public MovingSpriteFX(double x, double y, double width, double height) {
+        super(x, y, width, height);
     }
 
     public double getVelocityX() {
@@ -64,11 +64,11 @@ public class MovingSpriteFX extends SpriteFX {
     }
 
     public void transformX(double delta) {
-        setStartX(getStartX() + delta * getSpeedModifierX() * getVelocityX());
+        setCenterX(getCenterX() + delta * getSpeedModifierX() * getVelocityX());
     }
 
     public void transformY(double delta) {
-        setStartY(getStartY() + delta * getSpeedModifierY() * getVelocityY());
+        setCenterY(getCenterY() + delta * getSpeedModifierY() * getVelocityY());
     }
 
     public void transformPos(double delta) {
