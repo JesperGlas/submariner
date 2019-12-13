@@ -1,8 +1,6 @@
 package controllers;
 
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.image.Image;
-import main.MovingSprite;
 import main.MovingSpriteFX;
 import main.Sprite;
 
@@ -23,6 +21,10 @@ public class MovingSpriteController {
         this.minBoundY = minBoundY;
         this.maxBoundX = maxBoundX;
         this.maxBoundY = maxBoundY;
+    }
+
+    public ArrayList<MovingSpriteFX> getArray() {
+        return this.sprites;
     }
 
     public void add(MovingSpriteFX sprite) {
@@ -47,8 +49,27 @@ public class MovingSpriteController {
         return outOfBounds;
     }
 
+    public ArrayList<MovingSpriteFX> checkCollisions(MovingSpriteFX sprite, Boolean removeIfCollision) {
+        ArrayList<MovingSpriteFX> spritesCollision = new ArrayList<MovingSpriteFX>();
+        Iterator<MovingSpriteFX> movingSpriteFXIterator = sprites.iterator();
+
+        while (movingSpriteFXIterator.hasNext()) {
+            MovingSpriteFX current = movingSpriteFXIterator.next();
+
+            if (sprite.checkCollision(current)) {
+                spritesCollision.add(sprite);
+                if (removeIfCollision) {
+                    movingSpriteFXIterator.remove();
+                }
+            }
+        }
+        return spritesCollision;
+    }
+
     public void remove(Sprite sprite) {
-        sprites.remove(sprite);
+        if (sprite != null) {
+            sprites.remove(sprite);
+        }
     }
 
     public void updateAllPos(double delta) {
@@ -57,6 +78,10 @@ public class MovingSpriteController {
 
     public void render(GraphicsContext gc) {
         sprites.forEach(movingSpriteFX -> movingSpriteFX.drawGraphics(gc));
+    }
+
+    public void transformVelocityX(double value) {
+        sprites.forEach(spriteFX -> spriteFX.transformVelocityX(value));
     }
 
     public void print(String msg) {

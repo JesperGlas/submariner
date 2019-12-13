@@ -20,16 +20,16 @@ public class Sprite {
         return startX;
     }
 
-    public void setStartX(double startX) {
-        this.startX = startX;
+    public void setStartX(double x) {
+        this.startX = x;
     }
 
     public double getStartY() {
         return startY;
     }
 
-    public void setStartY(double startY) {
-        this.startY = startY;
+    public void setStartY(double y) {
+        this.startY = y;
     }
 
     public double getEndX() {
@@ -44,16 +44,16 @@ public class Sprite {
         return width;
     }
 
-    public void setWidth(double width) {
-        this.width = width;
+    public void setWidth(double w) {
+        this.width = w;
     }
 
     public double getHeight() {
         return height;
     }
 
-    public void setHeight(double height) {
-        this.height = height;
+    public void setHeight(double h) {
+        this.height = h;
     }
 
     public String getImgUrl() {

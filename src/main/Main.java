@@ -12,6 +12,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Main extends Application {
@@ -36,6 +37,7 @@ public class Main extends Application {
     private MovingSpriteFX player;
 
     private MovingSpriteController mines;
+    private MovingSpriteController torpedoes;
 
     private HashMap<KeyCode, Boolean> keys = new HashMap<KeyCode, Boolean>();
 
@@ -73,9 +75,80 @@ public class Main extends Application {
         mines = new MovingSpriteController(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
         MovingSpriteFX mine = new MovingSpriteFX(0, 0, 40, 40);
         mine.setImgUrl("/img/sprites/mine.png");
-        mine.setyVelocityLimit(1d);
-        mine.transformVelocityY(0.02d);
+        mine.setVelocityY(1d);
         mines.add(mine);
+    }
+
+    private void initTorpedoes() {
+        torpedoes = new MovingSpriteController(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+        MovingSpriteFX torpedo = new MovingSpriteFX(0, 20, 30, 15);
+        torpedo.setImgUrl("/img/sprites/torpedo.png");
+        torpedo.setVelocityX(2d);
+        MovingSpriteFX torpedo2 = new MovingSpriteFX(WINDOW_WIDTH - 30, 50, 30, 15);
+        torpedo2.setImgUrl("/img/sprites/torpedo.png");
+        torpedo2.setVelocityX(-1d);
+        torpedoes.add(torpedo);
+        torpedoes.add(torpedo2);
+    }
+
+    public void update() {
+        gameScene.setOnKeyPressed(keyEvent -> keys.put(keyEvent.getCode(), true));
+        gameScene.setOnKeyReleased(keyEvent -> keys.put(keyEvent.getCode(), false));
+
+        movePlayer();
+
+        player.transformPos(delta);
+        mines.updateAllPos(delta);
+        torpedoes.updateAllPos(delta);
+    }
+
+    public void render() {
+        background.drawGraphics(gameGraphics);
+        player.drawGraphics(gameGraphics);
+
+        mines.render(gameGraphics);
+        torpedoes.render(gameGraphics);
+    }
+
+    public void collisionAndClear() {
+        ArrayList<MovingSpriteFX> mineCollisions = mines.checkCollisions(player, true);
+        ArrayList<MovingSpriteFX> torpedoCollisions = torpedoes.checkCollisions(player, true);
+        if (mineCollisions.size() > 0) {
+            System.out.println("Mine Collision");
+        }
+        if (torpedoCollisions.size() > 0) {
+            System.out.println("Torpedoes Collision");
+        }
+        mines.checkOutOfBounds().forEach(mine -> mines.remove(mine));
+        torpedoes.checkOutOfBounds().forEach(torpedo -> torpedoes.remove(torpedo));
+    }
+
+    public Boolean isPressed(KeyCode key) {
+        return keys.getOrDefault(key, false);
+    }
+
+    public void movePlayer() {
+        double acceleration = 0.02d;
+        if (isPressed(KeyCode.W)) {
+            player.transformVelocityY((-1d) * acceleration);
+        }
+        if (isPressed(KeyCode.S)) {
+            player.transformVelocityY(acceleration);
+        }
+        if (isPressed(KeyCode.A)) {
+            player.transformVelocityX((-1d) * acceleration);
+        }
+        if (isPressed(KeyCode.D)) {
+            player.transformVelocityX(acceleration);
+        }
+    }
+
+    public void printInfo() {
+        System.out.println("Ticks and Frames: " + ticks);
+        player.print("Player: ");
+        mines.print("Mines: ");
+        torpedoes.print("Torpedoes: ");
+        System.out.println("Delta: " + delta);
     }
 
     /**
@@ -97,13 +170,14 @@ public class Main extends Application {
                 timer += now - lastUpdate;
                 lastUpdate = now;
 
-                delta = deltaT;
-
                 if (deltaT >= 1) {
 
-                    update();
+                    // Needed to avoid bug with high delta at the start of the game.
+                    delta = deltaT <= 10 ? deltaT : delta;
 
+                    update();
                     render();
+                    collisionAndClear();
 
                     ticks++;
                     deltaT = 0;
@@ -117,21 +191,6 @@ public class Main extends Application {
             }
         };
         timer.start();
-    }
-
-    public void update() {
-        gameScene.setOnKeyPressed(keyEvent -> keys.put(keyEvent.getCode(), true));
-        gameScene.setOnKeyReleased(keyEvent -> keys.put(keyEvent.getCode(), false));
-
-        movePlayer();
-        player.transformPos(delta);
-        mines.updateAllPos(delta);
-    }
-
-    public void render() {
-        background.drawGraphics(gameGraphics);
-        player.drawGraphics(gameGraphics);
-        mines.render(gameGraphics);
     }
 
     @Override
@@ -148,39 +207,12 @@ public class Main extends Application {
         initPlayer();
 
         initMines();
+        initTorpedoes();
 
         initAnimation();
     }
 
     public static void main(String[] args) {
         launch(args);
-    }
-
-    public Boolean isPressed(KeyCode key) {
-        return keys.getOrDefault(key, false);
-    }
-
-    public void moveCamera() {
-    }
-
-    public void movePlayer() {
-        double acceleration = 0.02d;
-        if (isPressed(KeyCode.W)) {
-            player.transformVelocityY((-1) * acceleration);
-        }
-        if (isPressed(KeyCode.S)) {
-            player.transformVelocityY(acceleration);
-        }
-        if (isPressed(KeyCode.A)) {
-            player.transformVelocityX((-1) * acceleration);
-        }
-        if (isPressed(KeyCode.D)) {
-            player.transformVelocityX(acceleration);
-        }
-    }
-
-    public void printInfo() {
-        System.out.println("Ticks and Frames: " + ticks);
-        mines.print("Mines: ");
     }
 }

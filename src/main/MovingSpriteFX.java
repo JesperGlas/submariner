@@ -8,8 +8,8 @@ public class MovingSpriteFX extends SpriteFX {
     private double yVelocity = 0d;
     private double xSpeedModifier = 1d;
     private double ySpeedModifier = 1d;
-    private double xVelocityLimit = 2d;
-    private double yVelocityLimit = 2d;
+    private double xVelocityLimit = 1d;
+    private double yVelocityLimit = 1d;
 
     public MovingSpriteFX(double startX, double startY, double width, double height) {
         super(startX, startY, width, height);
@@ -35,7 +35,7 @@ public class MovingSpriteFX extends SpriteFX {
         return xSpeedModifier;
     }
 
-    public void setxSpeedModifier(double value) {
+    public void setSpeedModifierX(double value) {
         this.xSpeedModifier = value;
     }
 
@@ -43,23 +43,23 @@ public class MovingSpriteFX extends SpriteFX {
         return ySpeedModifier;
     }
 
-    public void setySpeedModifier(double value) {
+    public void setSpeedModifierY(double value) {
         this.ySpeedModifier = value;
     }
 
-    public double getVelocityXLimit() {
+    public double getVelocityLimitX() {
         return xVelocityLimit;
     }
 
-    public void setxVelocityLimit(double value) {
+    public void setVelocityLimitX(double value) {
         this.xVelocityLimit = value;
     }
 
-    public double getVelocityYLimit() {
+    public double getVelocityLimitY() {
         return yVelocityLimit;
     }
 
-    public void setyVelocityLimit(double value) {
+    public void setVelocityLimitY(double value) {
         this.yVelocityLimit = value;
     }
 
@@ -68,7 +68,7 @@ public class MovingSpriteFX extends SpriteFX {
     }
 
     public void transformY(double delta) {
-        setStartY(getStartY() + delta * getVelocityY() * getSpeedModifierY());
+        setStartY(getStartY() + delta * getSpeedModifierY() * getVelocityY());
     }
 
     public void transformPos(double delta) {
@@ -77,11 +77,11 @@ public class MovingSpriteFX extends SpriteFX {
     }
 
     public void transformVelocityX(double value) {
-        setVelocityX(transformVelocity(value, getVelocityX(), getVelocityXLimit()));
+        setVelocityX(transformVelocity(value, getVelocityX(), getVelocityLimitX()));
     }
 
     public void transformVelocityY(double value) {
-        setVelocityY(transformVelocity(value, getVelocityY(), getVelocityYLimit()));
+        setVelocityY(transformVelocity(value, getVelocityY(), getVelocityLimitY()));
     }
 
     @Override
