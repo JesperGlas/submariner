@@ -92,4 +92,8 @@ public class Sprite {
                         endY > this.getStartY()
         );
     }
+
+    public void print(String msg) {
+        System.out.println(msg + "sX: " + getStartX() + " sY: " + getStartY() + " eX: " + getEndX() + " eY: " + getEndY());
+    }
 }

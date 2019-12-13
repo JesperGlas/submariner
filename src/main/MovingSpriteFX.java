@@ -10,6 +10,7 @@ public class MovingSpriteFX extends SpriteFX {
     private double ySpeedModifier = 1d;
     private double xVelocityLimit = 1d;
     private double yVelocityLimit = 1d;
+    private int directionX = 1;
 
     public MovingSpriteFX(double x, double y, double width, double height) {
         super(x, y, width, height);
@@ -63,6 +64,14 @@ public class MovingSpriteFX extends SpriteFX {
         this.yVelocityLimit = value;
     }
 
+    public int getDirectionX() {
+        return directionX;
+    }
+
+    public void setDirectionX(int directionX) {
+        this.directionX = directionX;
+    }
+
     public void transformX(double delta) {
         setCenterX(getCenterX() + delta * getSpeedModifierX() * getVelocityX());
     }
@@ -72,6 +81,11 @@ public class MovingSpriteFX extends SpriteFX {
     }
 
     public void transformPos(double delta) {
+        if (getVelocityX() > 0) {
+            setDirectionX(1);
+        } else if (getVelocityX() < 0) {
+            setDirectionX(-1);
+        }
         transformX(delta);
         transformY(delta);
     }
@@ -88,7 +102,7 @@ public class MovingSpriteFX extends SpriteFX {
     public void drawGraphics(GraphicsContext gc) {
         double xOffset = getStartX();
         double widthOffset = getWidth();
-        if (getVelocityX() < 0) {
+        if (getDirectionX() < 0) {
             xOffset += widthOffset;
             widthOffset = -widthOffset;
         }

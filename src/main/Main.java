@@ -1,6 +1,7 @@
 package main;
 
 import controllers.MovingSpriteController;
+import controllers.SpawnController;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -36,8 +37,15 @@ public class Main extends Application {
 
     private MovingSpriteFX player;
 
+    private final double mineWidth = 30d;
+    private final double mineHeight = mineWidth * 1.34d;
     private MovingSpriteController mines;
+    private SpawnController mineSpawnController;
+
+    private final double torpedoWidth = 30d;
+    private final double torpedoHeight = torpedoWidth / 2.4d;
     private MovingSpriteController torpedoes;
+    private SpawnController torpedoSpawnController;
 
     private HashMap<KeyCode, Boolean> keys = new HashMap<KeyCode, Boolean>();
 
@@ -65,32 +73,26 @@ public class Main extends Application {
     }
 
     private void initPlayer() {
-        double width = 60;
-        double height = 30;
+        double width = 80d;
+        double height = 30d;
         player = new MovingSpriteFX(WINDOW_WIDTH / 2d, WINDOW_HEIGHT / 2d, width, height);
+        player.setSpeedModifierY(2d);
+        player.setSpeedModifierX(2d);
         player.setVelocityLimitX(2d);
         player.setVelocityLimitY(2d);
-        player.setImgUrl("/img/sprites/sub.png");
+        player.setImgUrl("/img/sprites/uboat.png");
     }
 
     private void initMines() {
+        final double spacing = 2d;
         mines = new MovingSpriteController(0, 0, GAME_WIDTH, GAME_HEIGHT);
-        MovingSpriteFX mine = new MovingSpriteFX(20, 20, 40, 40);
-        mine.setImgUrl("/img/sprites/mine.png");
-        mine.setVelocityY(1d);
-        mines.add(mine);
+        mineSpawnController = new SpawnController(0, 0, GAME_WIDTH, mineHeight * spacing);
     }
 
     private void initTorpedoes() {
+        final double spacing = 4d;
         torpedoes = new MovingSpriteController(0, 0, GAME_WIDTH, GAME_HEIGHT);
-        MovingSpriteFX torpedo = new MovingSpriteFX(15, 20, 30, 15);
-        torpedo.setImgUrl("/img/sprites/torpedo.png");
-        torpedo.setVelocityX(2d);
-        MovingSpriteFX torpedo2 = new MovingSpriteFX(WINDOW_WIDTH - 30, 50, 30, 15);
-        torpedo2.setImgUrl("/img/sprites/torpedo.png");
-        torpedo2.setVelocityX(-1d);
-        torpedoes.add(torpedo);
-        torpedoes.add(torpedo2);
+        torpedoSpawnController = new SpawnController(0, 0, torpedoWidth * spacing, GAME_HEIGHT);
     }
 
     public void update() {
@@ -99,6 +101,8 @@ public class Main extends Application {
 
         movePlayer();
 
+        spawn();
+
         player.transformPos(delta);
         mines.updateAllPos(delta);
         torpedoes.updateAllPos(delta);
@@ -106,10 +110,24 @@ public class Main extends Application {
 
     public void render() {
         background.drawGraphics(gameGraphics);
-        player.drawGraphics(gameGraphics);
-
         mines.render(gameGraphics);
         torpedoes.render(gameGraphics);
+        player.drawGraphics(gameGraphics);
+    }
+
+    public void spawn() {
+        if (mineSpawnController.spawnAreaClear(mines.getArray())) {
+            MovingSpriteFX mine = new MovingSpriteFX(mineSpawnController.getRandomX(), mineHeight / 2d, mineWidth, mineHeight);
+            mine.setImgUrl("/img/sprites/barrel.png");
+            mine.setVelocityY(2d);
+            mines.add(mine);
+        }
+        if (torpedoSpawnController.spawnAreaClear(torpedoes.getArray())) {
+            MovingSpriteFX torpedo = new MovingSpriteFX(torpedoWidth / 2d, torpedoSpawnController.getRandomY(), torpedoWidth, torpedoHeight);
+            torpedo.setImgUrl("/img/sprites/torpedo.png");
+            torpedo.setVelocityX(3d);
+            torpedoes.add(torpedo);
+        }
     }
 
     public void collisionAndClear() {
@@ -175,6 +193,7 @@ public class Main extends Application {
         System.out.println("Ticks and Frames: " + ticks);
         player.print("Player: ");
         mines.print("Mines: ");
+        torpedoSpawnController.print("TSpawn: ");
         torpedoes.print("Torpedoes: ");
         System.out.println("Delta: " + delta);
     }
@@ -185,7 +204,7 @@ public class Main extends Application {
     private void initAnimation() {
         timer = new AnimationTimer() {
 
-            int FPS = 60;
+            int FPS = 30;
             double timesPerTick = 1_000_000_000L / FPS;
             double deltaT = 0L;
             long lastUpdate = 0L;
@@ -241,6 +260,7 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
+        System.out.println("Hej");
         launch(args);
     }
 }
