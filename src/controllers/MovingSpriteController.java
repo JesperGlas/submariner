@@ -56,8 +56,8 @@ public class MovingSpriteController {
         while (movingSpriteFXIterator.hasNext()) {
             MovingSpriteFX current = movingSpriteFXIterator.next();
 
-            if (sprite.checkCollision(current)) {
-                spritesCollision.add(sprite);
+            if (current.checkCollision(sprite)) {
+                spritesCollision.add(current);
                 if (removeIfCollision) {
                     movingSpriteFXIterator.remove();
                 }

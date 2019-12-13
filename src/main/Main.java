@@ -1,5 +1,6 @@
 package main;
 
+import controllers.AnimationController;
 import controllers.MovingSpriteController;
 import controllers.SpawnController;
 import javafx.animation.AnimationTimer;
@@ -15,6 +16,7 @@ import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 public class Main extends Application {
 
@@ -36,8 +38,10 @@ public class Main extends Application {
     private SpriteFX background;
 
     private MovingSpriteFX player;
+    double playerWidth = 100d;
+    double playerHeight = playerWidth / 2.28d;
 
-    private final double mineWidth = 30d;
+    private final double mineWidth = 20d;
     private final double mineHeight = mineWidth * 1.34d;
     private MovingSpriteController mines;
     private SpawnController mineSpawnController;
@@ -46,6 +50,8 @@ public class Main extends Application {
     private final double torpedoHeight = torpedoWidth / 2.4d;
     private MovingSpriteController torpedoes;
     private SpawnController torpedoSpawnController;
+
+    private AnimationController animations = new AnimationController();
 
     private HashMap<KeyCode, Boolean> keys = new HashMap<KeyCode, Boolean>();
 
@@ -73,9 +79,7 @@ public class Main extends Application {
     }
 
     private void initPlayer() {
-        double width = 80d;
-        double height = 30d;
-        player = new MovingSpriteFX(WINDOW_WIDTH / 2d, WINDOW_HEIGHT / 2d, width, height);
+        player = new MovingSpriteFX(GAME_WIDTH / 2d, GAME_HEIGHT / 2d, playerWidth, playerHeight);
         player.setSpeedModifierY(2d);
         player.setSpeedModifierX(2d);
         player.setVelocityLimitX(2d);
@@ -104,14 +108,18 @@ public class Main extends Application {
         spawn();
 
         player.transformPos(delta);
+
         mines.updateAllPos(delta);
         torpedoes.updateAllPos(delta);
+
+        animations.update();
     }
 
     public void render() {
         background.drawGraphics(gameGraphics);
         mines.render(gameGraphics);
         torpedoes.render(gameGraphics);
+        animations.render(gameGraphics);
         player.drawGraphics(gameGraphics);
     }
 
@@ -134,13 +142,27 @@ public class Main extends Application {
         ArrayList<MovingSpriteFX> mineCollisions = mines.checkCollisions(player, true);
         ArrayList<MovingSpriteFX> torpedoCollisions = torpedoes.checkCollisions(player, true);
         if (mineCollisions.size() > 0) {
-            System.out.println("Mine Collision");
+            mineCollisions.forEach(collision -> animations.add(new AnimatedSpriteFX(collision, "/img/animations/explosion", 23)));
         }
         if (torpedoCollisions.size() > 0) {
-            System.out.println("Torpedoes Collision");
+            torpedoCollisions.forEach(collision -> animations.add(new AnimatedSpriteFX(collision, "/img/animations/explosion", 23)));
         }
+        handleMineTorpedoCollisions();
         mines.checkOutOfBounds().forEach(mine -> mines.remove(mine));
         torpedoes.checkOutOfBounds().forEach(torpedo -> torpedoes.remove(torpedo));
+    }
+
+    private void handleMineTorpedoCollisions() {
+        Iterator<MovingSpriteFX> minesIterator = mines.getArray().iterator();
+
+        while (minesIterator.hasNext()) {
+            MovingSpriteFX mine = minesIterator.next();
+            ArrayList<MovingSpriteFX> mineCollisions = torpedoes.checkCollisions(mine, true);
+            mineCollisions.forEach(collision -> animations.add(new AnimatedSpriteFX(collision, "/img/animations/explosion", 23)));
+            if (!mineCollisions.isEmpty()) {
+                minesIterator.remove();
+            }
+        }
     }
 
     public Boolean isPressed(KeyCode key) {
@@ -149,6 +171,7 @@ public class Main extends Application {
 
     public void movePlayer() {
         double acceleration = 0.05d;
+        double deceleration = acceleration / 2d;
         Boolean xModified = false;
         Boolean yModified = false;
 
@@ -174,28 +197,28 @@ public class Main extends Application {
 
         if (!yModified) {
             if (player.getVelocityY() > 0) {
-                player.setVelocityY(player.decreaseOrLimit(player.getVelocityY(), acceleration, 0));
+                player.setVelocityY(player.decreaseOrLimit(player.getVelocityY(), deceleration, 0));
             } else {
-                player.setVelocityY(player.increaseOrLimit(player.getVelocityY(), acceleration, 0));
+                player.setVelocityY(player.increaseOrLimit(player.getVelocityY(), deceleration, 0));
             }
         }
 
         if (!xModified) {
             if (player.getVelocityX() > 0) {
-                player.setVelocityX(player.decreaseOrLimit(player.getVelocityX(), acceleration, 0));
+                player.setVelocityX(player.decreaseOrLimit(player.getVelocityX(), deceleration, 0));
             } else {
-                player.setVelocityX(player.increaseOrLimit(player.getVelocityX(), acceleration, 0));
+                player.setVelocityX(player.increaseOrLimit(player.getVelocityX(), deceleration, 0));
             }
         }
     }
 
     public void printInfo() {
         System.out.println("Ticks and Frames: " + ticks);
+        System.out.println("Delta: " + delta);
         player.print("Player: ");
         mines.print("Mines: ");
-        torpedoSpawnController.print("TSpawn: ");
         torpedoes.print("Torpedoes: ");
-        System.out.println("Delta: " + delta);
+        animations.print("Animations: ");
     }
 
     /**

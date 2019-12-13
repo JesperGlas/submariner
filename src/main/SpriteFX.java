@@ -7,13 +7,17 @@ public class SpriteFX extends Sprite {
 
     private Image img = new Image(String.valueOf(getClass().getResource(getImgUrl())));
 
-    public SpriteFX(double x, double y, double width, double height) {
-        super(x, y, width, height);
+    public SpriteFX(double xPos, double yPos, double width, double height) {
+        super(xPos, yPos, width, height);
     }
 
     @Override
     public void setImgUrl(String url) {
         this.img = new Image(String.valueOf(getClass().getResource(url)));
+    }
+
+    public void setImage(Image img) {
+        this.img = img;
     }
 
     public Image getImage() {
