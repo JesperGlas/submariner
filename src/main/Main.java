@@ -131,21 +131,43 @@ public class Main extends Application {
 
     public void movePlayer() {
         double acceleration = 0.05d;
+        Boolean xModified = false;
+        Boolean yModified = false;
 
         if (isPressed(KeyCode.W)) {
+            yModified = true;
             player.transformVelocityY((-1d) * acceleration);
         }
 
         if (isPressed(KeyCode.S)) {
+            yModified = true;
             player.transformVelocityY(acceleration);
         }
 
         if (isPressed(KeyCode.A)) {
+            xModified = true;
             player.transformVelocityX((-1d) * acceleration);
         }
 
         if (isPressed(KeyCode.D)) {
+            xModified = true;
             player.transformVelocityX(acceleration);
+        }
+
+        if (!yModified) {
+            if (player.getVelocityY() > 0) {
+                player.setVelocityY(player.decreaseOrLimit(player.getVelocityY(), acceleration, 0));
+            } else {
+                player.setVelocityY(player.increaseOrLimit(player.getVelocityY(), acceleration, 0));
+            }
+        }
+
+        if (!xModified) {
+            if (player.getVelocityX() > 0) {
+                player.setVelocityX(player.decreaseOrLimit(player.getVelocityX(), acceleration, 0));
+            } else {
+                player.setVelocityX(player.increaseOrLimit(player.getVelocityX(), acceleration, 0));
+            }
         }
     }
 

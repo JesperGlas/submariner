@@ -98,9 +98,9 @@ public class MovingSpriteFX extends SpriteFX {
     private double transformVelocity(double value, double current, double limit) {
         double transformedVelocity = current + value;
         if (value > 0) {
-            return transformedVelocity > limit ? limit : transformedVelocity;
+            return Math.min(transformedVelocity, limit);
         } else if (value < 0) {
-            return transformedVelocity < (-1) * limit ? (-1) * limit : transformedVelocity;
+            return Math.max(transformedVelocity, (-1) * limit);
         } else {
             return current;
         }
@@ -112,5 +112,15 @@ public class MovingSpriteFX extends SpriteFX {
 
     public void print(String msg) {
         System.out.println(msg + toString());
+    }
+
+    public double increaseOrLimit(double current, double increase, double limit) {
+        double newValue = current + increase;
+        return newValue > limit ? limit : newValue;
+    }
+
+    public double decreaseOrLimit(double current, double decrease, double limit) {
+        double newValue = current - decrease;
+        return newValue < limit ? limit : newValue;
     }
 }
