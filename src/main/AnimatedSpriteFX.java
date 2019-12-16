@@ -11,9 +11,10 @@ public class AnimatedSpriteFX extends SpriteFX {
     private int currentImageIndex = 0;
     private int frames;
 
-    public AnimatedSpriteFX(MovingSpriteFX sprite, String directoryURL, int frames) {
+    public AnimatedSpriteFX(MovingSpriteFX sprite, String directoryURL, double sizeModifier, int frames) {
         super(sprite.getCenterX(), sprite.getCenterY(), 0, 0);
-        double size = 2 * Math.max(sprite.getWidth(), sprite.getHeight());
+        double size = sizeModifier * Math.max(sprite.getWidth(), sprite.getHeight());
+        setImgUrl(directoryURL + "/" + currentImageIndex + ".png");
 
         setWidth(size);
         setHeight(size);

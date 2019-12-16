@@ -105,8 +105,6 @@ public class Main extends Application {
 
         movePlayer();
 
-        spawn();
-
         player.transformPos(delta);
 
         mines.updateAllPos(delta);
@@ -119,8 +117,8 @@ public class Main extends Application {
         background.drawGraphics(gameGraphics);
         mines.render(gameGraphics);
         torpedoes.render(gameGraphics);
-        animations.render(gameGraphics);
         player.drawGraphics(gameGraphics);
+        animations.render(gameGraphics);
     }
 
     public void spawn() {
@@ -138,16 +136,40 @@ public class Main extends Application {
         }
     }
 
-    public void collisionAndClear() {
+    private void collision() {
+        handleOutOfBoundsCollision();
+        handlePlayerCollision();
+        handleMineTorpedoCollisions();
+    }
+
+    public void handlePlayerCollision() {
         ArrayList<MovingSpriteFX> mineCollisions = mines.checkCollisions(player, true);
         ArrayList<MovingSpriteFX> torpedoCollisions = torpedoes.checkCollisions(player, true);
         if (mineCollisions.size() > 0) {
-            mineCollisions.forEach(collision -> animations.add(new AnimatedSpriteFX(collision, "/img/animations/explosion", 23)));
+            mineCollisions.forEach(collision -> animations.add(new AnimatedSpriteFX(collision, "/img/animations/explosion_2", 2.5, 23)));
         }
         if (torpedoCollisions.size() > 0) {
-            torpedoCollisions.forEach(collision -> animations.add(new AnimatedSpriteFX(collision, "/img/animations/explosion", 23)));
+            torpedoCollisions.forEach(collision -> animations.add(new AnimatedSpriteFX(collision, "/img/animations/explosion_2", 2.5, 23)));
         }
-        handleMineTorpedoCollisions();
+    }
+
+    private void handleOutOfBoundsCollision() {
+        // Player out of bounds
+        if (player.getStartX() <= 0 && player.getVelocityX() < 0) {
+            player.setVelocityX(0);
+            player.setCenterX(player.getWidth() / 2d);
+        } else if (player.getEndX() >= GAME_WIDTH && player.getVelocityX() > 0) {
+            player.setVelocityX(0);
+            player.setCenterX(GAME_WIDTH - player.getWidth() / 2d);
+        } else if (player.getStartY() <= 0 && player.getVelocityY() < 0) {
+            player.setVelocityY(0);
+            player.setCenterY(player.getHeight() / 2d);
+        } else if (player.getEndY() >= GAME_HEIGHT && player.getVelocityY() > 0) {
+            player.setVelocityY(0);
+            player.setCenterY(GAME_HEIGHT - player.getHeight() / 2d);
+        }
+
+        // Controllers out of bounds
         mines.checkOutOfBounds().forEach(mine -> mines.remove(mine));
         torpedoes.checkOutOfBounds().forEach(torpedo -> torpedoes.remove(torpedo));
     }
@@ -158,7 +180,7 @@ public class Main extends Application {
         while (minesIterator.hasNext()) {
             MovingSpriteFX mine = minesIterator.next();
             ArrayList<MovingSpriteFX> mineCollisions = torpedoes.checkCollisions(mine, true);
-            mineCollisions.forEach(collision -> animations.add(new AnimatedSpriteFX(collision, "/img/animations/explosion", 23)));
+            mineCollisions.forEach(collision -> animations.add(new AnimatedSpriteFX(collision, "/img/animations/explosion_2", 2.5, 23)));
             if (!mineCollisions.isEmpty()) {
                 minesIterator.remove();
             }
@@ -170,45 +192,34 @@ public class Main extends Application {
     }
 
     public void movePlayer() {
-        double acceleration = 0.05d;
+        double acceleration = 0.08d;
         double deceleration = acceleration / 2d;
-        Boolean xModified = false;
-        Boolean yModified = false;
+        int xDirection = 0;
+        int yDirection = 0;
 
-        if (isPressed(KeyCode.W)) {
-            yModified = true;
-            player.transformVelocityY((-1d) * acceleration);
-        }
+        yDirection = isPressed(KeyCode.W) ? -1 : yDirection;
+        yDirection = isPressed(KeyCode.S) ? 1 : yDirection;
+        xDirection = isPressed(KeyCode.A) ? -1 : xDirection;
+        xDirection = isPressed(KeyCode.D) ? 1 : xDirection;
 
-        if (isPressed(KeyCode.S)) {
-            yModified = true;
-            player.transformVelocityY(acceleration);
-        }
-
-        if (isPressed(KeyCode.A)) {
-            xModified = true;
-            player.transformVelocityX((-1d) * acceleration);
-        }
-
-        if (isPressed(KeyCode.D)) {
-            xModified = true;
-            player.transformVelocityX(acceleration);
-        }
-
-        if (!yModified) {
+        if (yDirection == 0) {
             if (player.getVelocityY() > 0) {
                 player.setVelocityY(player.decreaseOrLimit(player.getVelocityY(), deceleration, 0));
             } else {
                 player.setVelocityY(player.increaseOrLimit(player.getVelocityY(), deceleration, 0));
             }
+        } else {
+            player.transformVelocityY(yDirection * acceleration);
         }
 
-        if (!xModified) {
+        if (xDirection == 0) {
             if (player.getVelocityX() > 0) {
                 player.setVelocityX(player.decreaseOrLimit(player.getVelocityX(), deceleration, 0));
             } else {
                 player.setVelocityX(player.increaseOrLimit(player.getVelocityX(), deceleration, 0));
             }
+        } else {
+            player.transformVelocityX(xDirection * acceleration);
         }
     }
 
@@ -246,8 +257,9 @@ public class Main extends Application {
                     delta = deltaT <= 10 ? deltaT : delta;
 
                     update();
+                    spawn();
+                    collision();
                     render();
-                    collisionAndClear();
 
                     ticks++;
                     deltaT = 0;

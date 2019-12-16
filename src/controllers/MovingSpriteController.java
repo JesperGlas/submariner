@@ -86,6 +86,6 @@ public class MovingSpriteController {
 
     public void print(String msg) {
         System.out.println(msg + sprites.size());
-        sprites.forEach(movingSpriteFX -> movingSpriteFX.print("Sprite info: "));
+//        sprites.forEach(movingSpriteFX -> movingSpriteFX.print("Sprite info: "));
     }
 }
