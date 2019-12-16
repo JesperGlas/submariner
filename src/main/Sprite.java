@@ -9,45 +9,86 @@ public class Sprite {
 
     private String imgUrl = "/img/error.png";
 
-    public Sprite(double xPos, double yPos, double width, double height) {
-        this.centerX = xPos;
-        this.centerY = yPos;
+    public Sprite(double centerX, double centerY, double width, double height) {
+        this.centerX = centerX;
+        this.centerY = centerY;
         this.width = width;
         this.height = height;
     }
 
+    /**
+     * Getter for the sprites center x position.
+     * @return Center x value
+     */
     public double getCenterX() {
         return centerX;
     }
 
-    public void setCenterX(double centerX) {
-        this.centerX = centerX;
+    /**
+     * Setter for the sprites position using its center as the starting point.
+     * @param value is the current x position of the sprites center.
+     */
+    public void setCenterX(double value) {
+        this.centerX = value;
     }
 
+    /**
+     * Getter for the sprites center y position.
+     * @return Center y value.
+     */
     public double getCenterY() {
         return centerY;
     }
 
-    public void setCenterY(double centerY) {
-        this.centerY = centerY;
+    /**
+     * Setter for the sprites position using the center as the starting point.
+     * @param value is the current y position of the sprites center.
+     */
+    public void setCenterY(double value) {
+        this.centerY = value;
     }
 
+    /**
+     * Getter for the x value at the sprites top, left corner.
+     * @return x value at the top, left corner of the sprite.
+     */
     public double getStartX() {
         return this.centerX - this.width / 2d;
     }
 
-    public void setStartX(double x) {
-        this.centerX = x + this.width / 2d;
+    /**
+     * Setter for the sprites position using its top, left corner as the starting point.
+     * @param value is the current x position of the sprites top, left corner.
+     */
+    public void setStartX(double value) {
+        this.centerX = value + this.width / 2d;
     }
 
+    /**
+     * Getter for the sprites top, left corners y position.
+     * @return y value at the top, left corner of the sprite.
+     */
     public double getStartY() {
         return this.centerY - this.height / 2d;
     }
 
-    public void setStartY(double y) {
-        this.centerY = y + this.height / 2d;
+    /**
+     * Setter for the sprites position using its top, left corner as the starting point.
+     * @param value is the current y position of the sprites top, left corner.
+     */
+    public void setStartY(double value) {
+        this.centerY = value + this.height / 2d;
     }
 
+    /**
+     * Setter for the sprites position using its top, left corner as the starting point. The method uses the setStartX and setStartY methods.
+     * @param x is the current x position of the sprites top, left corner.
+     * @param y is the current y position of the sprites top, left corner
+     */
+    public void setStartPos(double x, double y) {
+        setStartX(x);
+        setStartY(y);
+    }
     public double getEndX() {
         return this.centerX + this.width / 2d;
     }

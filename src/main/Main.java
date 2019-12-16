@@ -24,10 +24,7 @@ public class Main extends Application {
     private final double WINDOW_WIDTH = 1600d;
     private final double WINDOW_HEIGHT = 1000d;
 
-    private final double UI_WIDTH = WINDOW_WIDTH / 4d;
-    private final double UI_HEIGHT = WINDOW_HEIGHT;
-
-    private final double GAME_WIDTH = WINDOW_WIDTH - UI_WIDTH;
+    private final double GAME_WIDTH = WINDOW_WIDTH;
     private final double GAME_HEIGHT = WINDOW_HEIGHT;
 
 
@@ -45,7 +42,6 @@ public class Main extends Application {
     private HashMap<KeyCode, Boolean> keys = new HashMap<KeyCode, Boolean>();
 
     private SpriteFX gameBackground;
-    private SpriteFX uiBackground;
 
     private MovingSpriteFX player;
     private final double playerWidth = 90d;
@@ -53,12 +49,12 @@ public class Main extends Application {
 
     private final double mineWidth = 20d;
     private final double mineHeight = mineWidth * 1.34d;
-    private MovingSpriteController mines;
+    private MovingSpriteController mineController;
     private SpawnController mineSpawnController;
 
     private final double torpedoWidth = 30d;
     private final double torpedoHeight = torpedoWidth / 2.4d;
-    private MovingSpriteController torpedoes;
+    private MovingSpriteController torpedoController;
     private SpawnController torpedoSpawnController;
 
     private final double intelWidth = 20d;
@@ -100,30 +96,28 @@ public class Main extends Application {
     }
 
     public void initBackground() {
-        gameBackground = new SpriteFX(GAME_WIDTH / 2d, GAME_HEIGHT / 2d, GAME_WIDTH, GAME_HEIGHT);
+        gameBackground = new SpriteFX(0, 0, GAME_WIDTH, GAME_HEIGHT);
+        gameBackground.setStartPos(0, 0);
         gameBackground.setImgUrl("/img/backgrounds/ocean.jpg");
         gameBackground.drawGraphics(gameGraphics);
-
     }
 
     private void initPlayer() {
         player = new MovingSpriteFX(GAME_WIDTH / 2d, GAME_HEIGHT / 2d, playerWidth, playerHeight);
-        player.setSpeedModifierY(2d);
-        player.setSpeedModifierX(2d);
-        player.setVelocityLimitX(2d);
-        player.setVelocityLimitY(2d);
+        player.setSpeedModifier(2d);
+        player.setVelocityLimit(3d);
         player.setImgUrl("/img/sprites/uboat.png");
     }
 
     private void initMines() {
         final double spacing = 2d;
-        mines = new MovingSpriteController(0, 0, GAME_WIDTH, GAME_HEIGHT);
+        mineController = new MovingSpriteController(0, 0, GAME_WIDTH, GAME_HEIGHT);
         mineSpawnController = new SpawnController(0, 0, GAME_WIDTH, mineHeight * spacing, 0);
     }
 
     private void initTorpedoes() {
         final double spacing = 4d;
-        torpedoes = new MovingSpriteController(0, 0, GAME_WIDTH, GAME_HEIGHT);
+        torpedoController = new MovingSpriteController(0, 0, GAME_WIDTH, GAME_HEIGHT);
         torpedoSpawnController = new SpawnController(0, 0, torpedoWidth * spacing, GAME_HEIGHT, 0);
     }
 
@@ -142,8 +136,8 @@ public class Main extends Application {
 
         player.transformPos(delta);
 
-        mines.updateAllPos(delta);
-        torpedoes.updateAllPos(delta);
+        mineController.updateAllPos(delta);
+        torpedoController.updateAllPos(delta);
         intelController.updateAllPos(delta);
 
         animations.update();
@@ -151,8 +145,8 @@ public class Main extends Application {
 
     public void render() {
         gameBackground.drawGraphics(gameGraphics);
-        mines.render(gameGraphics);
-        torpedoes.render(gameGraphics);
+        mineController.render(gameGraphics);
+        torpedoController.render(gameGraphics);
         intelController.render(gameGraphics);
         player.drawGraphics(gameGraphics);
         animations.render(gameGraphics);
@@ -160,17 +154,17 @@ public class Main extends Application {
 
     public void spawn() {
 
-        if (mineSpawnController.spawnAreaClear(mines.getArray())) {
+        if (mineSpawnController.spawnAreaClear(mineController.getArray())) {
             MovingSpriteFX mine = new MovingSpriteFX(mineSpawnController.getRandomX(), mineHeight / 2d, mineWidth, mineHeight);
             mine.setImgUrl("/img/sprites/barrel.png");
             mine.setVelocityY(2d);
-            mines.add(mine);
+            mineController.add(mine);
         }
-        if (torpedoSpawnController.spawnAreaClear(torpedoes.getArray())) {
+        if (torpedoSpawnController.spawnAreaClear(torpedoController.getArray())) {
             MovingSpriteFX torpedo = new MovingSpriteFX(torpedoWidth / 2d, torpedoSpawnController.getRandomY(), torpedoWidth, torpedoHeight);
             torpedo.setImgUrl("/img/sprites/torpedo.png");
             torpedo.setVelocityX(3d);
-            torpedoes.add(torpedo);
+            torpedoController.add(torpedo);
         }
         if (intelSpawnController.spawnAreaClear(intelController.getArray()) && intelSpawnController.delayFinished(elapsedSeconds)) {
             MovingSpriteFX intel = new MovingSpriteFX(intelSpawnController.getRandomX(), intelHeight / 2d, intelWidth, intelHeight);
@@ -188,12 +182,12 @@ public class Main extends Application {
     }
 
     public void handlePlayerCollision() {
-        ArrayList<MovingSpriteFX> mineCollisions = mines.checkCollisions(player, true);
+        ArrayList<MovingSpriteFX> mineCollisions = mineController.checkCollisions(player, true);
         if (mineCollisions.size() > 0) {
             mineCollisions.forEach(collision -> animations.add(new AnimatedSpriteFX(collision, "/img/animations/explosion_2", 2.5, 23)));
         }
 
-        ArrayList<MovingSpriteFX> torpedoCollisions = torpedoes.checkCollisions(player, true);
+        ArrayList<MovingSpriteFX> torpedoCollisions = torpedoController.checkCollisions(player, true);
         if (torpedoCollisions.size() > 0) {
             torpedoCollisions.forEach(collision -> animations.add(new AnimatedSpriteFX(collision, "/img/animations/explosion_2", 2.5, 23)));
         }
@@ -221,16 +215,16 @@ public class Main extends Application {
         }
 
         // Controllers out of bounds
-        mines.checkOutOfBounds().forEach(mine -> mines.remove(mine));
-        torpedoes.checkOutOfBounds().forEach(torpedo -> torpedoes.remove(torpedo));
+        mineController.checkOutOfBounds().forEach(mine -> mineController.remove(mine));
+        torpedoController.checkOutOfBounds().forEach(torpedo -> torpedoController.remove(torpedo));
     }
 
     private void handleMineTorpedoCollisions() {
-        Iterator<MovingSpriteFX> minesIterator = mines.getArray().iterator();
+        Iterator<MovingSpriteFX> minesIterator = mineController.getArray().iterator();
 
         while (minesIterator.hasNext()) {
             MovingSpriteFX mine = minesIterator.next();
-            ArrayList<MovingSpriteFX> mineCollisions = torpedoes.checkCollisions(mine, true);
+            ArrayList<MovingSpriteFX> mineCollisions = torpedoController.checkCollisions(mine, true);
             mineCollisions.forEach(collision -> animations.add(new AnimatedSpriteFX(collision, "/img/animations/explosion_2", 2.5, 23)));
             if (!mineCollisions.isEmpty()) {
                 minesIterator.remove();
@@ -279,8 +273,8 @@ public class Main extends Application {
         System.out.println("Score: " + score);
         System.out.println("Delta: " + delta);
         player.print("Player: ");
-        mines.print("Mines: ");
-        torpedoes.print("Torpedoes: ");
+        mineController.print("Mines: ");
+        torpedoController.print("Torpedoes: ");
         intelController.print("Intel: ");
         animations.print("Animations: ");
     }
@@ -342,7 +336,6 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
-        System.out.println("Hej");
         launch(args);
     }
 }

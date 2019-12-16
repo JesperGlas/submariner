@@ -48,6 +48,11 @@ public class MovingSpriteFX extends SpriteFX {
         this.ySpeedModifier = value;
     }
 
+    public void setSpeedModifier(double value) {
+        setSpeedModifierX(value);
+        setSpeedModifierY(value);
+    }
+
     public double getVelocityLimitX() {
         return xVelocityLimit;
     }
@@ -62,6 +67,11 @@ public class MovingSpriteFX extends SpriteFX {
 
     public void setVelocityLimitY(double value) {
         this.yVelocityLimit = value;
+    }
+
+    public void setVelocityLimit(double value) {
+        setVelocityLimitX(value);
+        setVelocityLimitY(value);
     }
 
     public int getDirectionX() {
