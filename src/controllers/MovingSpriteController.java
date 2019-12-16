@@ -88,4 +88,8 @@ public class MovingSpriteController {
         System.out.println(msg + sprites.size());
 //        sprites.forEach(movingSpriteFX -> movingSpriteFX.print("Sprite info: "));
     }
+
+    public int count() {
+        return this.sprites.size();
+    }
 }

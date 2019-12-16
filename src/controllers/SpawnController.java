@@ -9,8 +9,10 @@ import java.util.Random;
 public class SpawnController extends Sprite {
 
     private Random random = new Random();
+    private int delay = 0;
+    private int lastSpawn = 0;
 
-    public SpawnController(double xMin, double yMin, double xMax, double yMax) {
+    public SpawnController(double xMin, double yMin, double xMax, double yMax, int delaySeconds) {
         super(0, 0, 0, 0);
         double width = xMax - xMin;
         double height = yMax - yMin;
@@ -18,6 +20,23 @@ public class SpawnController extends Sprite {
         this.setCenterY(yMin + height / 2d);
         this.setWidth(width);
         this.setHeight(height);
+        this.setDelay(delaySeconds);
+    }
+
+    public int getLastSpawn() {
+        return lastSpawn;
+    }
+
+    public void setLastSpawn(int lastSpawn) {
+        this.lastSpawn = lastSpawn;
+    }
+
+    public int getDelay() {
+        return delay;
+    }
+
+    public void setDelay(int delay) {
+        this.delay = delay;
     }
 
     public Boolean spawnAreaClear(ArrayList<MovingSpriteFX> list) {
@@ -27,6 +46,10 @@ public class SpawnController extends Sprite {
             }
         }
         return true;
+    }
+
+    public Boolean delayFinished(int timestamp) {
+        return timestamp > lastSpawn + getDelay();
     }
 
     public double getRandomX() {
