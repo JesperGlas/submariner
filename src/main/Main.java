@@ -20,11 +20,11 @@ import java.util.Iterator;
 
 public class Main extends Application {
 
-    private double WINDOW_WIDTH = 1600d;
-    private double WINDOW_HEIGHT = 1000d;
+    private final double WINDOW_WIDTH = 1600d;
+    private final double WINDOW_HEIGHT = 1000d;
 
-    private double GAME_WIDTH = WINDOW_WIDTH;
-    private double GAME_HEIGHT = WINDOW_HEIGHT;
+    private final double GAME_WIDTH = WINDOW_WIDTH;
+    private final double GAME_HEIGHT = WINDOW_HEIGHT;
 
     private Scene startMenuScene;
     private Scene gameScene;
@@ -32,14 +32,13 @@ public class Main extends Application {
     private GraphicsContext gameGraphics;
     private AnimationTimer timer;
     private double delta = 1d;
-
     private int ticks = 0;
 
     private SpriteFX background;
 
     private MovingSpriteFX player;
-    double playerWidth = 100d;
-    double playerHeight = playerWidth / 2.28d;
+    private final double playerWidth = 100d;
+    private final double playerHeight = playerWidth / 2.28d;
 
     private final double mineWidth = 20d;
     private final double mineHeight = mineWidth * 1.34d;
