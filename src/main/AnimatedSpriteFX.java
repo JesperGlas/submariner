@@ -14,13 +14,11 @@ public class AnimatedSpriteFX extends SpriteFX {
     public AnimatedSpriteFX(MovingSpriteFX sprite, String directoryURL, double sizeModifier, int frames) {
         super(sprite.getCenterX(), sprite.getCenterY(), 0, 0);
         double size = sizeModifier * Math.max(sprite.getWidth(), sprite.getHeight());
-        setImgUrl(directoryURL + "/" + currentImageIndex + ".png");
-
-        setWidth(size);
-        setHeight(size);
         this.directoryURL = directoryURL;
         this.frames = frames;
-
+        setWidth(size);
+        setHeight(size);
+        setImgUrl(directoryURL + "/" + currentImageIndex + ".png");
         for (int n = 0; n < frames; n++) {
             String imagePath = directoryURL + "/" + n + ".png";
             images.add(new Image(String.valueOf(getClass().getResource(imagePath))));
@@ -36,7 +34,7 @@ public class AnimatedSpriteFX extends SpriteFX {
         return false;
     }
 
-    public Boolean isFinished() {
+    public Boolean animationFinished() {
         return currentImageIndex >= frames;
     }
 }

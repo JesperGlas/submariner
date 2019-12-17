@@ -5,13 +5,17 @@ import javafx.scene.image.Image;
 
 public class SpriteFX extends Sprite {
 
+    private String imgUrl = "/img/error.png";
     private Image img = new Image(String.valueOf(getClass().getResource(getImgUrl())));
 
     public SpriteFX(double xPos, double yPos, double width, double height) {
         super(xPos, yPos, width, height);
     }
 
-    @Override
+    public String getImgUrl() {
+        return imgUrl;
+    }
+
     public void setImgUrl(String url) {
         this.img = new Image(String.valueOf(getClass().getResource(url)));
     }

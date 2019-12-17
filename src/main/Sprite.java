@@ -7,8 +7,6 @@ public class Sprite {
     private double width;
     private double height;
 
-    private String imgUrl = "/img/error.png";
-
     public Sprite(double centerX, double centerY, double width, double height) {
         this.centerX = centerX;
         this.centerY = centerY;
@@ -113,14 +111,6 @@ public class Sprite {
         this.height = h;
     }
 
-    public String getImgUrl() {
-        return imgUrl;
-    }
-
-    public void setImgUrl(String imgUrl) {
-        this.imgUrl = imgUrl;
-    }
-
     public Boolean checkCollision(Sprite sprite) {
         return checkCollision(sprite.getStartX(), sprite.getStartY(), sprite.getStartX() + sprite.getWidth(), sprite.getStartY() + sprite.getHeight());
     }
@@ -128,9 +118,9 @@ public class Sprite {
     public Boolean checkCollision(double startX, double startY, double endX, double endY) {
         return (
                 this.getStartX() + this.getWidth() > startX &&
-                        this.getStartY() + this.getHeight() > startY &&
-                        endX > this.getStartX() &&
-                        endY > this.getStartY()
+                this.getStartY() + this.getHeight() > startY &&
+                endX > this.getStartX() &&
+                endY > this.getStartY()
         );
     }
 

@@ -6,12 +6,18 @@ import controllers.SpawnController;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
@@ -21,10 +27,13 @@ import java.util.Iterator;
 
 public class Main extends Application {
 
-    private final double WINDOW_WIDTH = 1600d;
+    private final double WINDOW_WIDTH = 1800d;
     private final double WINDOW_HEIGHT = 1000d;
 
-    private final double GAME_WIDTH = WINDOW_WIDTH;
+    private final double UI_WIDTH = 300d;
+    private final double UI__HEIGHT = WINDOW_HEIGHT;
+
+    private final double GAME_WIDTH = WINDOW_WIDTH - UI_WIDTH;
     private final double GAME_HEIGHT = WINDOW_HEIGHT;
 
 
@@ -43,7 +52,7 @@ public class Main extends Application {
 
     private SpriteFX gameBackground;
 
-    private MovingSpriteFX player;
+    private Player player;
     private final double playerWidth = 90d;
     private final double playerHeight = playerWidth / 2.28d;
 
@@ -68,6 +77,8 @@ public class Main extends Application {
     private SpawnController repairSpawnController;
 
     private int score = 0;
+    private UILabel scoreLabel;
+    private UILabel healthLabel;
 
     private void initScenes() throws Exception {
 
@@ -77,11 +88,26 @@ public class Main extends Application {
         startMenuScene.getStylesheets().addAll(getClass().getResource("/css/style.css").toExternalForm());
 
         // Game Scene
-        Group gameRoot = new Group();
-        Canvas gameCanvas = new Canvas(WINDOW_WIDTH, WINDOW_HEIGHT);
+        GridPane gameRoot = new GridPane();
+        gameRoot.setMinSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+        Canvas gameCanvas = new Canvas(GAME_WIDTH, GAME_HEIGHT);
+        VBox gameUI = new VBox();
+        gameUI.setAlignment(Pos.CENTER);
+        gameUI.setSpacing(10);
+        gameUI.setMinSize(UI_WIDTH, UI__HEIGHT);
+        gameUI.setBackground(new Background(new BackgroundImage(new Image(String.valueOf(getClass().getResource("/img/backgrounds/ui.jpg"))), null, null, BackgroundPosition.DEFAULT, new BackgroundSize(UI_WIDTH, UI__HEIGHT, false, false, true, true))));
+
+        scoreLabel = new UILabel("Score: " + score, UI_WIDTH, 0.8, 10);
+        healthLabel = new UILabel("Hull Points: 1000/1000", UI_WIDTH, 0.8, 10);
+        gameUI.getChildren().addAll(scoreLabel, healthLabel);
+
+        GridPane.setRowIndex(gameCanvas, 0);
+        GridPane.setColumnIndex(gameCanvas, 0);
+        GridPane.setColumnIndex(gameUI, 1);
 
         gameGraphics = gameCanvas.getGraphicsContext2D();
-        gameRoot.getChildren().addAll(gameCanvas);
+        gameRoot.getChildren().addAll(gameCanvas, gameUI);
 
         gameScene = new Scene(gameRoot, WINDOW_WIDTH, WINDOW_HEIGHT);
     }
@@ -103,10 +129,11 @@ public class Main extends Application {
     }
 
     private void initPlayer() {
-        player = new MovingSpriteFX(GAME_WIDTH / 2d, GAME_HEIGHT / 2d, playerWidth, playerHeight);
+        player = new Player(GAME_WIDTH / 2d, GAME_HEIGHT / 2d, playerWidth, playerHeight);
         player.setSpeedModifier(2d);
         player.setVelocityLimit(3d);
         player.setImgUrl("/img/sprites/uboat.png");
+        healthLabel.setText("Hull Points: " + player.getHealth() + "/1000");
     }
 
     private void initMines() {
@@ -184,18 +211,26 @@ public class Main extends Application {
     public void handlePlayerCollision() {
         ArrayList<MovingSpriteFX> mineCollisions = mineController.checkCollisions(player, true);
         if (mineCollisions.size() > 0) {
-            mineCollisions.forEach(collision -> animations.add(new AnimatedSpriteFX(collision, "/img/animations/explosion_2", 2.5, 23)));
+            mineCollisions.forEach(collision -> {
+                animations.add(new AnimatedSpriteFX(collision, "/img/animations/explosion_2", 2.5, 23));
+                player.modifyHealth(-50);
+            });
         }
 
         ArrayList<MovingSpriteFX> torpedoCollisions = torpedoController.checkCollisions(player, true);
         if (torpedoCollisions.size() > 0) {
-            torpedoCollisions.forEach(collision -> animations.add(new AnimatedSpriteFX(collision, "/img/animations/explosion_2", 2.5, 23)));
+            torpedoCollisions.forEach(collision -> {
+                animations.add(new AnimatedSpriteFX(collision, "/img/animations/explosion_2", 2.5, 23));
+                player.modifyHealth(-20);
+            });
         }
 
         ArrayList<MovingSpriteFX> intelCollisions = intelController.checkCollisions(player, true);
         if (intelCollisions.size() > 0) {
             score += intelCollisions.size();
+            scoreLabel.setText("Score: " + score);
         }
+        healthLabel.setText("Hull Points: " + player.getHealth() + "/1000");
     }
 
     private void handleOutOfBoundsCollision() {

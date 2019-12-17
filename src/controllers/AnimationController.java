@@ -2,7 +2,6 @@ package controllers;
 
 import javafx.scene.canvas.GraphicsContext;
 import main.AnimatedSpriteFX;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -22,11 +21,10 @@ public class AnimationController {
 
     public void update() {
         Iterator<AnimatedSpriteFX> spriteIterator = sprites.iterator();
-
         while (spriteIterator.hasNext()) {
             AnimatedSpriteFX sprite = spriteIterator.next();
             sprite.nextFrame();
-            if (sprite.isFinished()) {
+            if (sprite.animationFinished()) {
                 spriteIterator.remove();
             }
         }
