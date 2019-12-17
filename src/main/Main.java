@@ -93,13 +93,13 @@ public class Main extends Application {
 
         Canvas gameCanvas = new Canvas(GAME_WIDTH, GAME_HEIGHT);
         VBox gameUI = new VBox();
-        gameUI.setAlignment(Pos.CENTER);
         gameUI.setSpacing(10);
+        gameUI.setAlignment(Pos.TOP_CENTER);
         gameUI.setMinSize(UI_WIDTH, UI__HEIGHT);
         gameUI.setBackground(new Background(new BackgroundImage(new Image(String.valueOf(getClass().getResource("/img/backgrounds/ui.jpg"))), null, null, BackgroundPosition.DEFAULT, new BackgroundSize(UI_WIDTH, UI__HEIGHT, false, false, true, true))));
 
         scoreLabel = new UILabel("Score: " + score, UI_WIDTH, 0.8, 10);
-        healthLabel = new UILabel("Hull Points: 1000/1000", UI_WIDTH, 0.8, 10);
+        healthLabel = new UILabel("Hull Points  : 1000/1000", UI_WIDTH, 0.8, 10);
         gameUI.getChildren().addAll(scoreLabel, healthLabel);
 
         GridPane.setRowIndex(gameCanvas, 0);
@@ -110,15 +110,6 @@ public class Main extends Application {
         gameRoot.getChildren().addAll(gameCanvas, gameUI);
 
         gameScene = new Scene(gameRoot, WINDOW_WIDTH, WINDOW_HEIGHT);
-    }
-
-    private void initGameResources() {
-        initBackground();
-        initPlayer();
-        initMines();
-        initTorpedoes();
-        initIntel();
-        initAnimation();
     }
 
     public void initBackground() {
@@ -155,6 +146,24 @@ public class Main extends Application {
         intelSpawnController = new SpawnController(0, 0, GAME_WIDTH, intelHeight * spacing, delaySeconds);
     }
 
+    private void initRepair() {
+        final double spacing = 50d;
+        final int delaySeconds = 10;
+        repairController = new MovingSpriteController(0, 0, GAME_WIDTH, GAME_HEIGHT);
+        repairSpawnController = new SpawnController(0, 0, GAME_WIDTH, repairHeight * spacing, delaySeconds);
+    }
+
+    private void initGameResources() throws Exception {
+        initScenes();
+        initBackground();
+        initPlayer();
+        initMines();
+        initTorpedoes();
+        initIntel();
+        initRepair();
+        initAnimation();
+    }
+
     public void update() {
         gameScene.setOnKeyPressed(keyEvent -> keys.put(keyEvent.getCode(), true));
         gameScene.setOnKeyReleased(keyEvent -> keys.put(keyEvent.getCode(), false));
@@ -166,15 +175,19 @@ public class Main extends Application {
         mineController.updateAllPos(delta);
         torpedoController.updateAllPos(delta);
         intelController.updateAllPos(delta);
+        repairController.updateAllPos(delta);
 
         animations.update();
     }
 
     public void render() {
         gameBackground.drawGraphics(gameGraphics);
+
         mineController.render(gameGraphics);
         torpedoController.render(gameGraphics);
         intelController.render(gameGraphics);
+        repairController.render(gameGraphics);
+
         player.drawGraphics(gameGraphics);
         animations.render(gameGraphics);
     }
@@ -199,6 +212,13 @@ public class Main extends Application {
             intel.setVelocityY(1d);
             intelController.add(intel);
             intelSpawnController.setLastSpawn(elapsedSeconds);
+        }
+        if (repairSpawnController.spawnAreaClear(repairController.getArray()) && repairSpawnController.delayFinished(elapsedSeconds)) {
+            MovingSpriteFX repair = new MovingSpriteFX(repairSpawnController.getRandomX(), repairHeight / 2d, repairWidth, repairHeight);
+            repair.setImgUrl("/img/sprites/tools.png");
+            repair.setVelocityY(4d);
+            repairController.add(repair);
+            repairSpawnController.setLastSpawn(elapsedSeconds);
         }
     }
 
@@ -228,8 +248,13 @@ public class Main extends Application {
         ArrayList<MovingSpriteFX> intelCollisions = intelController.checkCollisions(player, true);
         if (intelCollisions.size() > 0) {
             score += intelCollisions.size();
-            scoreLabel.setText("Score: " + score);
         }
+
+        ArrayList<MovingSpriteFX> repairCollisions = repairController.checkCollisions(player, true);
+        if (repairCollisions.size() > 0) {
+            player.modifyHealth(25);
+        }
+        scoreLabel.setText("Score: " + score);
         healthLabel.setText("Hull Points: " + player.getHealth() + "/1000");
     }
 
@@ -361,13 +386,9 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("Submariner");
-
-        initScenes();
-
+        initGameResources();
         primaryStage.setScene(gameScene);
         primaryStage.show();
-
-        initGameResources();
     }
 
     public static void main(String[] args) {
