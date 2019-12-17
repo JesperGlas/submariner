@@ -6,13 +6,19 @@ import main.Sprite;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Random;
 
 public class MovingSpriteController {
+
+    private final Random random = new Random();
 
     private double minBoundX;
     private double minBoundY;
     private double maxBoundX;
     private double maxBoundY;
+
+    private int spawnDelay = 0;
+    private int lastSpawn = 0;
 
     private ArrayList<MovingSpriteFX> sprites = new ArrayList<MovingSpriteFX>();
 
@@ -21,6 +27,62 @@ public class MovingSpriteController {
         this.minBoundY = minBoundY;
         this.maxBoundX = maxBoundX;
         this.maxBoundY = maxBoundY;
+    }
+
+    public double getMinBoundX() {
+        return minBoundX;
+    }
+
+    public void setMinBoundX(double minBoundX) {
+        this.minBoundX = minBoundX;
+    }
+
+    public double getMinBoundY() {
+        return minBoundY;
+    }
+
+    public void setMinBoundY(double minBoundY) {
+        this.minBoundY = minBoundY;
+    }
+
+    public double getMaxBoundX() {
+        return maxBoundX;
+    }
+
+    public void setMaxBoundX(double maxBoundX) {
+        this.maxBoundX = maxBoundX;
+    }
+
+    public double getMaxBoundY() {
+        return maxBoundY;
+    }
+
+    public void setMaxBoundY(double maxBoundY) {
+        this.maxBoundY = maxBoundY;
+    }
+
+    public int getSpawnDelay() {
+        return spawnDelay;
+    }
+
+    public void setSpawnDelay(int spawnDelay) {
+        this.spawnDelay = spawnDelay;
+    }
+
+    public int getLastSpawn() {
+        return lastSpawn;
+    }
+
+    public void setLastSpawn(int lastSpawn) {
+        this.lastSpawn = lastSpawn;
+    }
+
+    public double getRandomX() {
+        return getRandom(getMinBoundX(), getMaxBoundX());
+    }
+
+    public double getRandomY() {
+        return getRandom(getMinBoundY(), getMaxBoundY());
     }
 
     public ArrayList<MovingSpriteFX> getArray() {
@@ -80,16 +142,52 @@ public class MovingSpriteController {
         sprites.forEach(movingSpriteFX -> movingSpriteFX.drawGraphics(gc));
     }
 
+    public void spawn(MovingSpriteFX sprite, int currentTime) {
+        add(sprite);
+        setLastSpawn(currentTime);
+    }
+
+    public void spawnAt(MovingSpriteFX sprite, int currentTime, double x, double y) {
+        if(!onDelay(currentTime)) {
+            sprite.setStartX(x);
+            sprite.setStartY(y);
+            spawn(sprite, currentTime);
+        }
+    }
+
+    public void spawnAtRandomX(MovingSpriteFX sprite, int currentTime) {
+        if (!onDelay(currentTime)) {
+            sprite.setStartX(getRandomX());
+            sprite.setStartY(getMinBoundY());
+            spawn(sprite, currentTime);
+        }
+    }
+
+    public void spawnAtRandomY(MovingSpriteFX sprite, int currentTime) {
+        if (!onDelay(currentTime)) {
+            sprite.setStartX(getMinBoundX());
+            sprite.setStartY(getRandomY());
+            spawn(sprite, currentTime);
+        }
+    }
+
     public void transformVelocityX(double value) {
         sprites.forEach(spriteFX -> spriteFX.transformVelocityX(value));
     }
 
     public void print(String msg) {
         System.out.println(msg + sprites.size());
-//        sprites.forEach(movingSpriteFX -> movingSpriteFX.print("Sprite info: "));
     }
 
     public int count() {
         return this.sprites.size();
+    }
+
+    public Boolean onDelay(int currentSeconds) {
+        return getLastSpawn() + getSpawnDelay() >= currentSeconds;
+    }
+
+    private double getRandom(double rangeMin, double rangeMax) {
+        return rangeMin + (rangeMax - rangeMin) * random.nextDouble();
     }
 }

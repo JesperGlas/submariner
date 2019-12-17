@@ -16,6 +16,12 @@ public class MovingSpriteFX extends SpriteFX {
         super(x, y, width, height);
     }
 
+    public MovingSpriteFX(double x, double y, double width, double height, String imageUrl) {
+        super(x, y, width, height);
+        setImgUrl(imageUrl);
+    }
+
+
     public double getVelocityX() {
         return xVelocity;
     }

@@ -2,23 +2,17 @@ package main;
 
 import controllers.AnimationController;
 import controllers.MovingSpriteController;
-import controllers.SpawnController;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -59,22 +53,18 @@ public class Main extends Application {
     private final double mineWidth = 20d;
     private final double mineHeight = mineWidth * 1.34d;
     private MovingSpriteController mineController;
-    private SpawnController mineSpawnController;
 
     private final double torpedoWidth = 30d;
     private final double torpedoHeight = torpedoWidth / 2.4d;
     private MovingSpriteController torpedoController;
-    private SpawnController torpedoSpawnController;
 
     private final double intelWidth = 20d;
     private final double intelHeight = intelWidth;
     private MovingSpriteController intelController;
-    private SpawnController intelSpawnController;
 
     private final double repairWidth = 20d;
     private final double repairHeight = repairWidth;
     private MovingSpriteController repairController;
-    private SpawnController repairSpawnController;
 
     private int score = 0;
     private UILabel scoreLabel;
@@ -128,29 +118,27 @@ public class Main extends Application {
     }
 
     private void initMines() {
-        final double spacing = 2d;
+        final int delay = 1;
         mineController = new MovingSpriteController(0, 0, GAME_WIDTH, GAME_HEIGHT);
-        mineSpawnController = new SpawnController(0, 0, GAME_WIDTH, mineHeight * spacing, 0);
+        mineController.setSpawnDelay(delay);
     }
 
     private void initTorpedoes() {
-        final double spacing = 4d;
+        final int delay = 1;
         torpedoController = new MovingSpriteController(0, 0, GAME_WIDTH, GAME_HEIGHT);
-        torpedoSpawnController = new SpawnController(0, 0, torpedoWidth * spacing, GAME_HEIGHT, 0);
+        torpedoController.setSpawnDelay(delay);
     }
 
     private void initIntel() {
-        final double spacing = 20d;
         final int delaySeconds = 10;
         intelController = new MovingSpriteController(0, 0, GAME_WIDTH, GAME_HEIGHT);
-        intelSpawnController = new SpawnController(0, 0, GAME_WIDTH, intelHeight * spacing, delaySeconds);
+        intelController.setSpawnDelay(delaySeconds);
     }
 
     private void initRepair() {
-        final double spacing = 50d;
         final int delaySeconds = 10;
         repairController = new MovingSpriteController(0, 0, GAME_WIDTH, GAME_HEIGHT);
-        repairSpawnController = new SpawnController(0, 0, GAME_WIDTH, repairHeight * spacing, delaySeconds);
+        repairController.setSpawnDelay(delaySeconds);
     }
 
     private void initGameResources() throws Exception {
@@ -193,32 +181,25 @@ public class Main extends Application {
     }
 
     public void spawn() {
-
-        if (mineSpawnController.spawnAreaClear(mineController.getArray())) {
-            MovingSpriteFX mine = new MovingSpriteFX(mineSpawnController.getRandomX(), mineHeight / 2d, mineWidth, mineHeight);
-            mine.setImgUrl("/img/sprites/barrel.png");
+        if (!mineController.onDelay(elapsedSeconds)) {
+            MovingSpriteFX mine = new MovingSpriteFX(0, 0, mineWidth, mineHeight, "/img/sprites/barrel.png");
             mine.setVelocityY(2d);
-            mineController.add(mine);
+            mineController.spawnAt(mine, elapsedSeconds, player.getCenterX(), mineController.getMinBoundY());
         }
-        if (torpedoSpawnController.spawnAreaClear(torpedoController.getArray())) {
-            MovingSpriteFX torpedo = new MovingSpriteFX(torpedoWidth / 2d, torpedoSpawnController.getRandomY(), torpedoWidth, torpedoHeight);
-            torpedo.setImgUrl("/img/sprites/torpedo.png");
+        if (!torpedoController.onDelay(elapsedSeconds)) {
+            MovingSpriteFX torpedo = new MovingSpriteFX(0, 0, torpedoWidth, torpedoHeight, "/img/sprites/torpedo.png");
             torpedo.setVelocityX(3d);
-            torpedoController.add(torpedo);
+            torpedoController.spawnAtRandomY(torpedo, elapsedSeconds);
         }
-        if (intelSpawnController.spawnAreaClear(intelController.getArray()) && intelSpawnController.delayFinished(elapsedSeconds)) {
-            MovingSpriteFX intel = new MovingSpriteFX(intelSpawnController.getRandomX(), intelHeight / 2d, intelWidth, intelHeight);
-            intel.setImgUrl("/img/sprites/folder.png");
+        if (!intelController.onDelay(elapsedSeconds)) {
+            MovingSpriteFX intel = new MovingSpriteFX(0, 0, intelWidth, intelHeight, "/img/sprites/folder.png");
             intel.setVelocityY(1d);
-            intelController.add(intel);
-            intelSpawnController.setLastSpawn(elapsedSeconds);
+            intelController.spawnAtRandomX(intel, elapsedSeconds);
         }
-        if (repairSpawnController.spawnAreaClear(repairController.getArray()) && repairSpawnController.delayFinished(elapsedSeconds)) {
-            MovingSpriteFX repair = new MovingSpriteFX(repairSpawnController.getRandomX(), repairHeight / 2d, repairWidth, repairHeight);
-            repair.setImgUrl("/img/sprites/tools.png");
+        if (!repairController.onDelay(elapsedSeconds)) {
+            MovingSpriteFX repair = new MovingSpriteFX(0, 0, repairWidth, repairHeight, "/img/sprites/tools.png");
             repair.setVelocityY(4d);
-            repairController.add(repair);
-            repairSpawnController.setLastSpawn(elapsedSeconds);
+            repairController.spawnAtRandomX(repair, elapsedSeconds);
         }
     }
 
