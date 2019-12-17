@@ -7,6 +7,7 @@ public class Player extends MovingSpriteFX {
     private ArrayList<MovingSpriteFX> torpedoes = new ArrayList<MovingSpriteFX>();
     private double maxHealth = 1000;
     private double health = maxHealth;
+    private Boolean detected = false;
 
     public Player(double startX, double startY, double width, double height) {
         super(startX, startY, width, height);
@@ -28,6 +29,14 @@ public class Player extends MovingSpriteFX {
         this.maxHealth = maxHealth;
     }
 
+    public Boolean getDetected() {
+        return detected;
+    }
+
+    public void setDetected(Boolean detected) {
+        this.detected = detected;
+    }
+
     public void modifyHealth(double value) {
         double modifiedHealth = getHealth() + value;
         if (value < 0) {
@@ -36,4 +45,6 @@ public class Player extends MovingSpriteFX {
             setHealth(Math.min(modifiedHealth, getMaxHealth()));
         }
     }
+
+
 }

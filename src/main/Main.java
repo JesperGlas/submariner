@@ -30,6 +30,7 @@ public class Main extends Application {
     private final double GAME_WIDTH = WINDOW_WIDTH - UI_WIDTH;
     private final double GAME_HEIGHT = WINDOW_HEIGHT;
 
+    private final int FPS = 30;
 
     private Scene startMenuScene;
     private Scene gameScene;
@@ -39,6 +40,7 @@ public class Main extends Application {
     private double delta = 1d;
     private int ticks = 0;
     private int elapsedSeconds = 0;
+    private long elapsedFrames = 0L;
 
     private AnimationController animations = new AnimationController();
 
@@ -52,10 +54,12 @@ public class Main extends Application {
 
     private final double mineWidth = 20d;
     private final double mineHeight = mineWidth * 1.34d;
+    private double mineSpawnDelay = 1.5 * FPS;
     private MovingSpriteController mineController;
 
     private final double torpedoWidth = 30d;
     private final double torpedoHeight = torpedoWidth / 2.4d;
+    private double torpedoSpawnDelay = 0.8 * FPS;
     private MovingSpriteController torpedoController;
 
     private final double intelWidth = 20d;
@@ -66,9 +70,12 @@ public class Main extends Application {
     private final double repairHeight = repairWidth;
     private MovingSpriteController repairController;
 
+    private final Sprite surfaceDetectionZone = new SpriteFX(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
     private int score = 0;
     private UILabel scoreLabel;
     private UILabel healthLabel;
+    private UILabel detectionLabel;
 
     private void initScenes() throws Exception {
 
@@ -82,15 +89,12 @@ public class Main extends Application {
         gameRoot.setMinSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 
         Canvas gameCanvas = new Canvas(GAME_WIDTH, GAME_HEIGHT);
-        VBox gameUI = new VBox();
-        gameUI.setSpacing(10);
-        gameUI.setAlignment(Pos.TOP_CENTER);
-        gameUI.setMinSize(UI_WIDTH, UI__HEIGHT);
-        gameUI.setBackground(new Background(new BackgroundImage(new Image(String.valueOf(getClass().getResource("/img/backgrounds/ui.jpg"))), null, null, BackgroundPosition.DEFAULT, new BackgroundSize(UI_WIDTH, UI__HEIGHT, false, false, true, true))));
+        GameUI gameUI = new GameUI(UI_WIDTH, UI__HEIGHT);
 
-        scoreLabel = new UILabel("Score: " + score, UI_WIDTH, 0.8, 10);
-        healthLabel = new UILabel("Hull Points  : 1000/1000", UI_WIDTH, 0.8, 10);
-        gameUI.getChildren().addAll(scoreLabel, healthLabel);
+        scoreLabel = new UILabel("Score: " + score, UI_WIDTH, 0.8d, 10);
+        healthLabel = new UILabel("Hull Points  : 1000/1000", UI_WIDTH, 0.8d, 10);
+        detectionLabel = new UILabel("Detection: ", UI_WIDTH, 0.8d, 10);
+        gameUI.getChildren().addAll(scoreLabel, healthLabel, detectionLabel);
 
         GridPane.setRowIndex(gameCanvas, 0);
         GridPane.setColumnIndex(gameCanvas, 0);
@@ -117,34 +121,39 @@ public class Main extends Application {
         healthLabel.setText("Hull Points: " + player.getHealth() + "/1000");
     }
 
+    private void initSurfaceDetectionZone() {
+        surfaceDetectionZone.setStartPos(0, 0);
+        surfaceDetectionZone.setWidth(GAME_WIDTH);
+        surfaceDetectionZone.setHeight(GAME_HEIGHT / 2d);
+    }
+
     private void initMines() {
-        final int delay = 1;
         mineController = new MovingSpriteController(0, 0, GAME_WIDTH, GAME_HEIGHT);
-        mineController.setSpawnDelay(delay);
+        mineController.setSpawnDelay(mineSpawnDelay);
     }
 
     private void initTorpedoes() {
-        final int delay = 1;
         torpedoController = new MovingSpriteController(0, 0, GAME_WIDTH, GAME_HEIGHT);
-        torpedoController.setSpawnDelay(delay);
+        torpedoController.setSpawnDelay(torpedoSpawnDelay);
     }
 
     private void initIntel() {
-        final int delaySeconds = 10;
+        final int delayFrames = 10 * FPS;
         intelController = new MovingSpriteController(0, 0, GAME_WIDTH, GAME_HEIGHT);
-        intelController.setSpawnDelay(delaySeconds);
+        intelController.setSpawnDelay(delayFrames);
     }
 
     private void initRepair() {
-        final int delaySeconds = 10;
+        final int delayFrames = 10 * FPS;
         repairController = new MovingSpriteController(0, 0, GAME_WIDTH, GAME_HEIGHT);
-        repairController.setSpawnDelay(delaySeconds);
+        repairController.setSpawnDelay(delayFrames);
     }
 
     private void initGameResources() throws Exception {
         initScenes();
         initBackground();
         initPlayer();
+        initSurfaceDetectionZone();
         initMines();
         initTorpedoes();
         initIntel();
@@ -181,25 +190,28 @@ public class Main extends Application {
     }
 
     public void spawn() {
-        if (!mineController.onDelay(elapsedSeconds)) {
+        if (!mineController.onDelay(elapsedFrames)) {
             MovingSpriteFX mine = new MovingSpriteFX(0, 0, mineWidth, mineHeight, "/img/sprites/barrel.png");
             mine.setVelocityY(2d);
-            mineController.spawnAt(mine, elapsedSeconds, player.getCenterX(), mineController.getMinBoundY());
+            // Assign a temporary variable that determines if the mines are dropped above the player or at random based on player y position.
+            double mineXPos = player.getDetected() ? player.getCenterX() : mineController.getRandomX();
+            mineController.spawnAt(mine, elapsedFrames, mineXPos, mineController.getMinBoundY());
+
         }
-        if (!torpedoController.onDelay(elapsedSeconds)) {
+        if (!torpedoController.onDelay(elapsedFrames)) {
             MovingSpriteFX torpedo = new MovingSpriteFX(0, 0, torpedoWidth, torpedoHeight, "/img/sprites/torpedo.png");
-            torpedo.setVelocityX(3d);
-            torpedoController.spawnAtRandomY(torpedo, elapsedSeconds);
+            torpedo.setVelocityX(6d);
+            torpedoController.spawnAtRandomY(torpedo, elapsedFrames);
         }
-        if (!intelController.onDelay(elapsedSeconds)) {
+        if (!intelController.onDelay(elapsedFrames)) {
             MovingSpriteFX intel = new MovingSpriteFX(0, 0, intelWidth, intelHeight, "/img/sprites/folder.png");
             intel.setVelocityY(1d);
-            intelController.spawnAtRandomX(intel, elapsedSeconds);
+            intelController.spawnAtRandomX(intel, elapsedFrames);
         }
-        if (!repairController.onDelay(elapsedSeconds)) {
+        if (!repairController.onDelay(elapsedFrames)) {
             MovingSpriteFX repair = new MovingSpriteFX(0, 0, repairWidth, repairHeight, "/img/sprites/tools.png");
             repair.setVelocityY(4d);
-            repairController.spawnAtRandomX(repair, elapsedSeconds);
+            repairController.spawnAtRandomX(repair, elapsedFrames);
         }
     }
 
@@ -235,8 +247,14 @@ public class Main extends Application {
         if (repairCollisions.size() > 0) {
             player.modifyHealth(25);
         }
+
+        player.setDetected(surfaceDetectionZone.checkCollision(player));
+
         scoreLabel.setText("Score: " + score);
         healthLabel.setText("Hull Points: " + player.getHealth() + "/1000");
+
+        String detectionStr = player.getDetected() ? "WARNING! Surface Detection!" : "HIDDEN";
+        detectionLabel.setText(detectionStr);
     }
 
     private void handleOutOfBoundsCollision() {
@@ -326,7 +344,6 @@ public class Main extends Application {
     private void initAnimation() {
         timer = new AnimationTimer() {
 
-            int FPS = 30;
             double timesPerTick = 1_000_000_000L / FPS;
             double deltaT = 0L;
             long lastUpdate = 0L;
@@ -350,6 +367,7 @@ public class Main extends Application {
                     render();
 
                     ticks++;
+                    elapsedFrames++;
                     deltaT = 0;
                 }
 

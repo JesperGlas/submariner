@@ -87,6 +87,12 @@ public class Sprite {
         setStartX(x);
         setStartY(y);
     }
+
+    public void setEndPos(double x, double y) {
+        setWidth(getStartX() - x);
+        setHeight(getStartY() - y);
+    }
+
     public double getEndX() {
         return this.centerX + this.width / 2d;
     }

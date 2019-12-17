@@ -17,8 +17,8 @@ public class MovingSpriteController {
     private double maxBoundX;
     private double maxBoundY;
 
-    private int spawnDelay = 0;
-    private int lastSpawn = 0;
+    private double spawnDelay = 0d;
+    private long lastSpawn = 0L;
 
     private ArrayList<MovingSpriteFX> sprites = new ArrayList<MovingSpriteFX>();
 
@@ -61,19 +61,19 @@ public class MovingSpriteController {
         this.maxBoundY = maxBoundY;
     }
 
-    public int getSpawnDelay() {
+    public double getSpawnDelay() {
         return spawnDelay;
     }
 
-    public void setSpawnDelay(int spawnDelay) {
-        this.spawnDelay = spawnDelay;
+    public void setSpawnDelay(double delayFrames) {
+        this.spawnDelay = delayFrames;
     }
 
-    public int getLastSpawn() {
+    public long getLastSpawn() {
         return lastSpawn;
     }
 
-    public void setLastSpawn(int lastSpawn) {
+    public void setLastSpawn(long lastSpawn) {
         this.lastSpawn = lastSpawn;
     }
 
@@ -142,12 +142,12 @@ public class MovingSpriteController {
         sprites.forEach(movingSpriteFX -> movingSpriteFX.drawGraphics(gc));
     }
 
-    public void spawn(MovingSpriteFX sprite, int currentTime) {
+    public void spawn(MovingSpriteFX sprite, long currentFrame) {
         add(sprite);
-        setLastSpawn(currentTime);
+        setLastSpawn(currentFrame);
     }
 
-    public void spawnAt(MovingSpriteFX sprite, int currentTime, double x, double y) {
+    public void spawnAt(MovingSpriteFX sprite, long currentTime, double x, double y) {
         if(!onDelay(currentTime)) {
             sprite.setStartX(x);
             sprite.setStartY(y);
@@ -155,7 +155,7 @@ public class MovingSpriteController {
         }
     }
 
-    public void spawnAtRandomX(MovingSpriteFX sprite, int currentTime) {
+    public void spawnAtRandomX(MovingSpriteFX sprite, long currentTime) {
         if (!onDelay(currentTime)) {
             sprite.setStartX(getRandomX());
             sprite.setStartY(getMinBoundY());
@@ -163,11 +163,11 @@ public class MovingSpriteController {
         }
     }
 
-    public void spawnAtRandomY(MovingSpriteFX sprite, int currentTime) {
-        if (!onDelay(currentTime)) {
+    public void spawnAtRandomY(MovingSpriteFX sprite, long currentFrame) {
+        if (!onDelay(currentFrame)) {
             sprite.setStartX(getMinBoundX());
             sprite.setStartY(getRandomY());
-            spawn(sprite, currentTime);
+            spawn(sprite, currentFrame);
         }
     }
 
@@ -183,8 +183,8 @@ public class MovingSpriteController {
         return this.sprites.size();
     }
 
-    public Boolean onDelay(int currentSeconds) {
-        return getLastSpawn() + getSpawnDelay() >= currentSeconds;
+    public Boolean onDelay(long currentFrame) {
+        return getLastSpawn() + getSpawnDelay() >= currentFrame;
     }
 
     private double getRandom(double rangeMin, double rangeMax) {
