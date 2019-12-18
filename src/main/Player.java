@@ -1,10 +1,11 @@
 package main;
 
+import controllers.MovingSpriteController;
+
 import java.util.ArrayList;
 
 public class Player extends MovingSpriteFX {
 
-    private ArrayList<MovingSpriteFX> torpedoes = new ArrayList<MovingSpriteFX>();
     private double maxHealth = 1000;
     private double health = maxHealth;
     private Boolean detected = false;

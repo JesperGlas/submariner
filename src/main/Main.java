@@ -49,8 +49,8 @@ public class Main extends Application {
     private HashMap<KeyCode, Boolean> keys = new HashMap<KeyCode, Boolean>();
 
     private SpriteFX gameBackground;
-
     private Player player;
+    private final Sprite surfaceDetectionZone = new SpriteFX(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
     private final double mineWidth = 20d;
     private final double mineHeight = mineWidth * 1.34d;
@@ -68,7 +68,9 @@ public class Main extends Application {
     private final double repairHeight = repairWidth;
     private MovingSpriteController repairController;
 
-    private final Sprite surfaceDetectionZone = new SpriteFX(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    private final double missileWidth = 20d;
+    private final double missileHeight = missileWidth * 1.6d;
+    private MovingSpriteController missileController;
 
     private int score = 0;
     private UILabel scoreLabel;
@@ -162,6 +164,12 @@ public class Main extends Application {
         repairController.setSpawnDelay(delayFrames);
     }
 
+    private void initMissileController() {
+        final int delayFrames = 2 * FPS;
+        missileController = new MovingSpriteController(0, (-missileHeight), GAME_WIDTH, (GAME_HEIGHT + (2d * missileHeight)));
+        missileController.setSpawnDelay(delayFrames);
+    }
+
     /**
      * Initiates the games animation timer
      */
@@ -217,6 +225,7 @@ public class Main extends Application {
         initTorpedoController();
         initIntelController();
         initRepairController();
+        initMissileController();
         initAnimation();
     }
 
@@ -326,6 +335,12 @@ public class Main extends Application {
         xDirection = isPressed(KeyCode.A) ? -1 : xDirection;
         xDirection = isPressed(KeyCode.D) ? 1 : xDirection;
 
+        if (isPressed(KeyCode.F) && !missileController.onDelay(elapsedFrames)) {
+            MovingSpriteFX missile = new MovingSpriteFX(player.getCenterX(), player.getCenterY(), mineWidth, mineHeight, "/img/sprites/missile .png");
+            missile.setVelocityY((-1) * 6d);
+            missileController.spawn(missile, elapsedFrames);
+        }
+
         if (yDirection == 0) {
             if (player.getVelocityY() > 0) {
                 player.setVelocityY(player.decreaseOrLimit(player.getVelocityY(), deceleration, 0));
@@ -370,6 +385,7 @@ public class Main extends Application {
         torpedoController.update(delta);
         intelController.update(delta);
         repairController.update(delta);
+        missileController.update(delta);
 
         animations.update();
     }
@@ -381,6 +397,7 @@ public class Main extends Application {
         torpedoController.render(gameGraphics);
         intelController.render(gameGraphics);
         repairController.render(gameGraphics);
+        missileController.render(gameGraphics);
 
         player.drawGraphics(gameGraphics);
         animations.render(gameGraphics);
@@ -397,7 +414,7 @@ public class Main extends Application {
         }
         if (!torpedoController.onDelay(elapsedFrames)) {
             MovingSpriteFX torpedo = new MovingSpriteFX(0, 0, torpedoWidth, torpedoHeight, "/img/sprites/torpedo.png");
-            torpedo.setVelocityX(6d);
+            torpedo.setVelocityX(5d);
             torpedoController.spawnAtRandomY(torpedo, elapsedFrames);
         }
         if (!intelController.onDelay(elapsedFrames)) {
