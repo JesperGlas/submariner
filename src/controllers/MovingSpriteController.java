@@ -134,8 +134,16 @@ public class MovingSpriteController {
         }
     }
 
-    public void updateAllPos(double delta) {
-        sprites.forEach(movingSpriteFX -> movingSpriteFX.transformPos(delta));
+    public void update(double delta) {
+        Iterator<MovingSpriteFX> spriteFXIterator = sprites.iterator();
+        while (spriteFXIterator.hasNext()) {
+            MovingSpriteFX sprite = spriteFXIterator.next();
+            if (sprite.getActive()) {
+                sprite.transformPos(delta);
+            } else {
+                spriteFXIterator.remove();
+            }
+        }
     }
 
     public void render(GraphicsContext gc) {

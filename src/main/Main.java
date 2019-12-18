@@ -110,7 +110,9 @@ public class Main extends Application {
     }
 
     private void initSound() {
-        soundController.addMedia("Boom", "/sounds/boom.mp3");
+        soundController.addMedia("boom", "/sounds/boom.mp3");
+        soundController.addMedia("intel", "/sounds/intel.mp3");
+        soundController.addMedia("repair", "/sounds/repair.mp3");
     }
 
     public void initBackground() {
@@ -149,7 +151,7 @@ public class Main extends Application {
     }
 
     private void initIntelController() {
-        final int delayFrames = 10 * FPS;
+        final int delayFrames = 5 * FPS;
         intelController = new MovingSpriteController(0, (-intelHeight), GAME_WIDTH, (GAME_HEIGHT + (2d * intelHeight)));
         intelController.setSpawnDelay(delayFrames);
     }
@@ -158,6 +160,51 @@ public class Main extends Application {
         final int delayFrames = 10 * FPS;
         repairController = new MovingSpriteController(0, (-repairHeight), GAME_WIDTH, (GAME_HEIGHT + (2d * repairHeight)));
         repairController.setSpawnDelay(delayFrames);
+    }
+
+    /**
+     * Initiates the games animation timer
+     */
+    private void initAnimation() {
+        // Needed to avoid bug with high delta at the start of the game.
+        AnimationTimer timer = new AnimationTimer() {
+
+            double timesPerTick = 1_000_000_000L / FPS;
+            double deltaT = 0L;
+            long lastUpdate = 0L;
+            long timer = 0L;
+
+            @Override
+            public void handle(long now) {
+
+                deltaT += (now - lastUpdate) / timesPerTick;
+                timer += now - lastUpdate;
+                lastUpdate = now;
+
+                if (deltaT >= 1) {
+
+                    // Needed to avoid bug with high delta at the start of the game.
+                    delta = deltaT <= 10 ? deltaT : delta;
+
+                    update();
+                    spawn();
+                    collision();
+                    render();
+
+                    ticks++;
+                    elapsedFrames++;
+                    deltaT = 0;
+                }
+
+                if (timer >= 1_000_000_000L) {
+                    elapsedSeconds++;
+                    printInfo();
+                    ticks = 0;
+                    timer = 0L;
+                }
+            }
+        };
+        timer.start();
     }
 
     private void initGameResources() throws Exception {
@@ -173,72 +220,11 @@ public class Main extends Application {
         initAnimation();
     }
 
-    public void update() {
-        gameScene.setOnKeyPressed(keyEvent -> keys.put(keyEvent.getCode(), true));
-        gameScene.setOnKeyReleased(keyEvent -> keys.put(keyEvent.getCode(), false));
-
-        movePlayer();
-
-        player.transformPos(delta);
-
-        mineController.updateAllPos(delta);
-        torpedoController.updateAllPos(delta);
-        intelController.updateAllPos(delta);
-        repairController.updateAllPos(delta);
-
-        animations.update();
-    }
-
-    public void render() {
-        gameBackground.drawGraphics(gameGraphics);
-
-        mineController.render(gameGraphics);
-        torpedoController.render(gameGraphics);
-        intelController.render(gameGraphics);
-        repairController.render(gameGraphics);
-
-        player.drawGraphics(gameGraphics);
-        animations.render(gameGraphics);
-    }
-
-    public void spawn() {
-        if (!mineController.onDelay(elapsedFrames)) {
-            MovingSpriteFX mine = new MovingSpriteFX(0, 0, mineWidth, mineHeight, "/img/sprites/barrel.png");
-            mine.setVelocityY(2d);
-            // Assign a temporary variable that determines if the mines are dropped above the player or at random based on player y position.
-            double mineXPos = player.getDetected() ? player.getCenterX() : mineController.getRandomX();
-            mineController.spawnAt(mine, elapsedFrames, mineXPos, mineController.getMinBoundY());
-
-        }
-        if (!torpedoController.onDelay(elapsedFrames)) {
-            MovingSpriteFX torpedo = new MovingSpriteFX(0, 0, torpedoWidth, torpedoHeight, "/img/sprites/torpedo.png");
-            torpedo.setVelocityX(6d);
-            torpedoController.spawnAtRandomY(torpedo, elapsedFrames);
-        }
-        if (!intelController.onDelay(elapsedFrames)) {
-            MovingSpriteFX intel = new MovingSpriteFX(0, 0, intelWidth, intelHeight, "/img/sprites/folder.png");
-            intel.setVelocityY(1d);
-            intelController.spawnAtRandomX(intel, elapsedFrames);
-        }
-        if (!repairController.onDelay(elapsedFrames)) {
-            MovingSpriteFX repair = new MovingSpriteFX(0, 0, repairWidth, repairHeight, "/img/sprites/tools.png");
-            repair.setVelocityY(4d);
-            repairController.spawnAtRandomX(repair, elapsedFrames);
-        }
-    }
-
-    private void collision() {
-        handleOutOfBoundsCollision();
-        handlePlayerCollision();
-        handleMineTorpedoCollisions();
-        handleExplosiveZoneCollision();
-    }
-
     public void handlePlayerCollision() {
         ArrayList<MovingSpriteFX> mineCollisions = mineController.checkCollisions(player, true);
         if (mineCollisions.size() > 0) {
             mineCollisions.forEach(collision -> {
-                triggerExplosive(collision, mineController);
+                triggerExplosive(collision);
                 player.modifyHealth(-50);
             });
         }
@@ -246,7 +232,7 @@ public class Main extends Application {
         ArrayList<MovingSpriteFX> torpedoCollisions = torpedoController.checkCollisions(player, true);
         if (torpedoCollisions.size() > 0) {
             torpedoCollisions.forEach(collision -> {
-                triggerExplosive(collision, torpedoController);
+                triggerExplosive(collision);
                 player.modifyHealth(-20);
             });
         }
@@ -254,11 +240,13 @@ public class Main extends Application {
         ArrayList<MovingSpriteFX> intelCollisions = intelController.checkCollisions(player, true);
         if (intelCollisions.size() > 0) {
             score += intelCollisions.size();
+            soundController.play("intel");
         }
 
         ArrayList<MovingSpriteFX> repairCollisions = repairController.checkCollisions(player, true);
         if (repairCollisions.size() > 0) {
             player.modifyHealth(25);
+            soundController.play("repair");
         }
 
         player.setDetected(surfaceDetectionZone.checkCollision(player));
@@ -266,7 +254,7 @@ public class Main extends Application {
         scoreLabel.setText("Score: " + score);
         healthLabel.setText("Hull Points: " + player.getHealth() + "/1000");
 
-        String detectionStr = player.getDetected() ? "WARNING! Surface Detection!" : "HIDDEN";
+        String detectionStr = player.getDetected() ? "WARNING! Surface Detection!" : "HIDDEN!";
         detectionLabel.setText(detectionStr);
     }
 
@@ -292,48 +280,35 @@ public class Main extends Application {
     }
 
     private void handleMineTorpedoCollisions() {
-        Iterator<MovingSpriteFX> minesIterator = mineController.getArray().iterator();
-
-        while (minesIterator.hasNext()) {
-            MovingSpriteFX mine = minesIterator.next();
+        mineController.getArray().forEach(mine -> {
             ArrayList<MovingSpriteFX> mineCollisions = torpedoController.checkCollisions(mine, true);
-            mineCollisions.forEach(collision -> triggerExplosive(collision, mineController));
+            mineCollisions.forEach(this::triggerExplosive);
             if (!mineCollisions.isEmpty()) {
-                minesIterator.remove();
+                mine.setActive(false);
             }
-        }
+        });
     }
 
     private void handleExplosiveZoneCollision() {
+        ArrayList<MovingSpriteFX> collidedSprites = new ArrayList<>();
         animations.getArray().forEach(explosion -> {
             if (explosion.checkCircularCollision(player, 4d)) {
                 player.transformVelocityX(player.getCenterX() > explosion.getCenterX() ? 0.4d : -0.4d);
                 player.transformVelocityY(player.getCenterY() > explosion.getCenterY() ? 0.4d : -0.4d);
             }
+            mineController.getArray().stream().filter(mine -> explosion.checkCircularCollision(mine, 2.5d)).forEach(collidedSprites::add);
+            torpedoController.getArray().stream().filter(torpedo -> explosion.checkCircularCollision(torpedo, 2.5)).forEach(collidedSprites::add);
+        });
 
-            Iterator<MovingSpriteFX> mineIterator = mineController.getArray().iterator();
-            while (mineIterator.hasNext()) {
-                MovingSpriteFX mine = mineIterator.next();
-                if (explosion.checkCircularCollision(mine, 2.5d)) {
-                    triggerExplosive(mine, mineController);
-                    mineIterator.remove();
-                }
-            };
-
-            Iterator<MovingSpriteFX> torpedoIterator = torpedoController.getArray().iterator();
-            while (torpedoIterator.hasNext()) {
-                MovingSpriteFX torpedo = torpedoIterator.next();
-                if (explosion.checkCircularCollision(torpedo, 2.5)) {
-                    triggerExplosive(torpedo, torpedoController);
-                    torpedoIterator.remove();
-                }
-            };
+        collidedSprites.forEach(collidedSprite -> {
+            triggerExplosive(collidedSprite);
+            collidedSprite.setActive(false);
         });
     }
 
-    private void triggerExplosive(MovingSpriteFX sprite, MovingSpriteController controller) {
+    private void triggerExplosive(MovingSpriteFX sprite) {
         animations.add(new AnimatedSpriteFX(sprite, "/img/animations/explosion_2", 2.5d, 23));
-        soundController.play("Boom");
+        soundController.play("boom");
     }
 
     public Boolean isPressed(KeyCode key) {
@@ -383,49 +358,65 @@ public class Main extends Application {
         animations.print("Animations: ");
     }
 
-    /**
-     * Initiates the games animation timer
-     */
-    private void initAnimation() {
-        // Needed to avoid bug with high delta at the start of the game.
-        AnimationTimer timer = new AnimationTimer() {
+    public void update() {
+        gameScene.setOnKeyPressed(keyEvent -> keys.put(keyEvent.getCode(), true));
+        gameScene.setOnKeyReleased(keyEvent -> keys.put(keyEvent.getCode(), false));
 
-            double timesPerTick = 1_000_000_000L / FPS;
-            double deltaT = 0L;
-            long lastUpdate = 0L;
-            long timer = 0L;
+        movePlayer();
 
-            @Override
-            public void handle(long now) {
+        player.transformPos(delta);
 
-                deltaT += (now - lastUpdate) / timesPerTick;
-                timer += now - lastUpdate;
-                lastUpdate = now;
+        mineController.update(delta);
+        torpedoController.update(delta);
+        intelController.update(delta);
+        repairController.update(delta);
 
-                if (deltaT >= 1) {
+        animations.update();
+    }
 
-                    // Needed to avoid bug with high delta at the start of the game.
-                    delta = deltaT <= 10 ? deltaT : delta;
+    public void render() {
+        gameBackground.drawGraphics(gameGraphics);
 
-                    update();
-                    spawn();
-                    collision();
-                    render();
+        mineController.render(gameGraphics);
+        torpedoController.render(gameGraphics);
+        intelController.render(gameGraphics);
+        repairController.render(gameGraphics);
 
-                    ticks++;
-                    elapsedFrames++;
-                    deltaT = 0;
-                }
+        player.drawGraphics(gameGraphics);
+        animations.render(gameGraphics);
+    }
 
-                if (timer >= 1_000_000_000L) {
-                    elapsedSeconds++;
-                    printInfo();
-                    ticks = 0;
-                    timer = 0L;
-                }
-            }
-        };
-        timer.start();
+    public void spawn() {
+        if (!mineController.onDelay(elapsedFrames)) {
+            MovingSpriteFX mine = new MovingSpriteFX(0, 0, mineWidth, mineHeight, "/img/sprites/barrel.png");
+            mine.setVelocityY(2d);
+            // Assign a temporary variable that determines if the mines are dropped above the player or at random based on player y position.
+            double mineXPos = player.getDetected() ? player.getCenterX() : mineController.getRandomX();
+            mineController.spawnAt(mine, elapsedFrames, mineXPos, mineController.getMinBoundY());
+
+        }
+        if (!torpedoController.onDelay(elapsedFrames)) {
+            MovingSpriteFX torpedo = new MovingSpriteFX(0, 0, torpedoWidth, torpedoHeight, "/img/sprites/torpedo.png");
+            torpedo.setVelocityX(6d);
+            torpedoController.spawnAtRandomY(torpedo, elapsedFrames);
+        }
+        if (!intelController.onDelay(elapsedFrames)) {
+            MovingSpriteFX intel = new MovingSpriteFX(0, 0, intelWidth, intelHeight, "/img/sprites/folder.png");
+            intel.setVelocityY(1d);
+            intelController.spawnAtRandomX(intel, elapsedFrames);
+        }
+        if (!repairController.onDelay(elapsedFrames)) {
+            MovingSpriteFX repair = new MovingSpriteFX(0, 0, repairWidth, repairHeight, "/img/sprites/tools.png");
+            repair.setVelocityY(4d);
+            repairController.spawnAtRandomX(repair, elapsedFrames);
+        }
+    }
+
+    private void collision() {
+        handleOutOfBoundsCollision();
+        handlePlayerCollision();
+        handleMineTorpedoCollisions();
+        handleExplosiveZoneCollision();
     }
 
     @Override

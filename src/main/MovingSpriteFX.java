@@ -11,6 +11,7 @@ public class MovingSpriteFX extends SpriteFX {
     private double xVelocityLimit = 1d;
     private double yVelocityLimit = 1d;
     private int directionX = 1;
+    private Boolean active = true;
 
     public MovingSpriteFX(double x, double y, double width, double height) {
         super(x, y, width, height);
@@ -20,7 +21,6 @@ public class MovingSpriteFX extends SpriteFX {
         super(x, y, width, height);
         setImgUrl(imageUrl);
     }
-
 
     public double getVelocityX() {
         return xVelocity;
@@ -86,6 +86,14 @@ public class MovingSpriteFX extends SpriteFX {
 
     public void setDirectionX(int directionX) {
         this.directionX = directionX;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 
     public void transformX(double delta) {
