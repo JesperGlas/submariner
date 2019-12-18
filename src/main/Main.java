@@ -2,6 +2,7 @@ package main;
 
 import controllers.AnimationController;
 import controllers.MovingSpriteController;
+import controllers.SoundController;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -13,6 +14,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -42,6 +44,7 @@ public class Main extends Application {
     private long elapsedFrames = 0L;
 
     private AnimationController animations = new AnimationController(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    private SoundController soundController = new SoundController();
 
     private HashMap<KeyCode, Boolean> keys = new HashMap<KeyCode, Boolean>();
 
@@ -106,6 +109,10 @@ public class Main extends Application {
         gameUI.getChildren().addAll(scoreLabel, healthLabel, detectionLabel);
     }
 
+    private void initSound() {
+        soundController.addMedia("Boom", "/sounds/boom.mp3");
+    }
+
     public void initBackground() {
         gameBackground = new SpriteFX(0, 0, GAME_WIDTH, GAME_HEIGHT);
         gameBackground.setStartPos(0, 0);
@@ -155,6 +162,7 @@ public class Main extends Application {
 
     private void initGameResources() throws Exception {
         initScenes();
+        initSound();
         initBackground();
         initPlayer();
         initSurfaceDetectionZone();
@@ -298,26 +306,34 @@ public class Main extends Application {
 
     private void handleExplosiveZoneCollision() {
         animations.getArray().forEach(explosion -> {
-            mineController.getArray().forEach(mine -> {
-                if (explosion.checkCircularCollision(player, 4d)) {
-                    player.transformVelocityX(player.getCenterX() > explosion.getCenterX() ? 0.4d : -0.4d);
-                    player.transformVelocityY(player.getCenterY() > explosion.getCenterY() ? 0.4d : -0.4d);
-                }
+            if (explosion.checkCircularCollision(player, 4d)) {
+                player.transformVelocityX(player.getCenterX() > explosion.getCenterX() ? 0.4d : -0.4d);
+                player.transformVelocityY(player.getCenterY() > explosion.getCenterY() ? 0.4d : -0.4d);
+            }
+
+            Iterator<MovingSpriteFX> mineIterator = mineController.getArray().iterator();
+            while (mineIterator.hasNext()) {
+                MovingSpriteFX mine = mineIterator.next();
                 if (explosion.checkCircularCollision(mine, 2.5d)) {
                     triggerExplosive(mine, mineController);
+                    mineIterator.remove();
                 }
-            });
-            torpedoController.getArray().forEach(torpedo -> {
+            };
+
+            Iterator<MovingSpriteFX> torpedoIterator = torpedoController.getArray().iterator();
+            while (torpedoIterator.hasNext()) {
+                MovingSpriteFX torpedo = torpedoIterator.next();
                 if (explosion.checkCircularCollision(torpedo, 2.5)) {
                     triggerExplosive(torpedo, torpedoController);
+                    torpedoIterator.remove();
                 }
-            });
+            };
         });
     }
 
     private void triggerExplosive(MovingSpriteFX sprite, MovingSpriteController controller) {
         animations.add(new AnimatedSpriteFX(sprite, "/img/animations/explosion_2", 2.5d, 23));
-        controller.remove(sprite);
+        soundController.play("Boom");
     }
 
     public Boolean isPressed(KeyCode key) {
