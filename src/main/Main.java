@@ -90,11 +90,9 @@ public class Main extends Application {
 
         Canvas gameCanvas = new Canvas(GAME_WIDTH, GAME_HEIGHT);
         GameUI gameUI = new GameUI(UI_WIDTH, UI__HEIGHT);
-
-        scoreLabel = new UILabel("Score: " + score, UI_WIDTH, 0.8d, 10);
-        healthLabel = new UILabel("Hull Points  : 1000/1000", UI_WIDTH, 0.8d, 10);
-        detectionLabel = new UILabel("Detection: ", UI_WIDTH, 0.8d, 10);
-        gameUI.getChildren().addAll(scoreLabel, healthLabel, detectionLabel);
+        
+        // Broken off in to separate method for easier reading.
+        initUI(gameUI);
 
         GridPane.setRowIndex(gameCanvas, 0);
         GridPane.setColumnIndex(gameCanvas, 0);
@@ -104,6 +102,13 @@ public class Main extends Application {
         gameRoot.getChildren().addAll(gameCanvas, gameUI);
 
         gameScene = new Scene(gameRoot, WINDOW_WIDTH, WINDOW_HEIGHT);
+    }
+
+    public void initUI(GameUI gameUI) {
+        scoreLabel = new UILabel("Score: " + score, UI_WIDTH, 0.8d, 10);
+        healthLabel = new UILabel("Hull Points  : 1000/1000", UI_WIDTH, 0.8d, 10);
+        detectionLabel = new UILabel("Detection: ", UI_WIDTH, 0.8d, 10);
+        gameUI.getChildren().addAll(scoreLabel, healthLabel, detectionLabel);
     }
 
     public void initBackground() {
@@ -122,30 +127,30 @@ public class Main extends Application {
     }
 
     private void initSurfaceDetectionZone() {
-        surfaceDetectionZone.setStartPos(0, 0);
         surfaceDetectionZone.setWidth(GAME_WIDTH);
         surfaceDetectionZone.setHeight(GAME_HEIGHT / 2d);
+        surfaceDetectionZone.setStartPos(0, 0);
     }
 
-    private void initMines() {
-        mineController = new MovingSpriteController(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    private void initMineController() {
+        mineController = new MovingSpriteController(0, (-mineHeight), GAME_WIDTH, (GAME_HEIGHT + (2d * mineHeight)));
         mineController.setSpawnDelay(mineSpawnDelay);
     }
 
-    private void initTorpedoes() {
-        torpedoController = new MovingSpriteController(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    private void initTorpedoController() {
+        torpedoController = new MovingSpriteController((-torpedoWidth), 0, (GAME_WIDTH + (2d * torpedoWidth)), GAME_HEIGHT);
         torpedoController.setSpawnDelay(torpedoSpawnDelay);
     }
 
-    private void initIntel() {
+    private void initIntelController() {
         final int delayFrames = 10 * FPS;
-        intelController = new MovingSpriteController(0, 0, GAME_WIDTH, GAME_HEIGHT);
+        intelController = new MovingSpriteController(0, (-intelHeight), GAME_WIDTH, (GAME_HEIGHT + (2d * intelHeight)));
         intelController.setSpawnDelay(delayFrames);
     }
 
-    private void initRepair() {
+    private void initRepairController() {
         final int delayFrames = 10 * FPS;
-        repairController = new MovingSpriteController(0, 0, GAME_WIDTH, GAME_HEIGHT);
+        repairController = new MovingSpriteController(0, (-repairHeight), GAME_WIDTH, (GAME_HEIGHT + (2d * repairHeight)));
         repairController.setSpawnDelay(delayFrames);
     }
 
@@ -154,10 +159,10 @@ public class Main extends Application {
         initBackground();
         initPlayer();
         initSurfaceDetectionZone();
-        initMines();
-        initTorpedoes();
-        initIntel();
-        initRepair();
+        initMineController();
+        initTorpedoController();
+        initIntelController();
+        initRepairController();
         initAnimation();
     }
 
