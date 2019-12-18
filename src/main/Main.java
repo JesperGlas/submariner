@@ -36,30 +36,25 @@ public class Main extends Application {
     private Scene gameScene;
 
     private GraphicsContext gameGraphics;
-    private AnimationTimer timer;
     private double delta = 1d;
     private int ticks = 0;
     private int elapsedSeconds = 0;
     private long elapsedFrames = 0L;
 
-    private AnimationController animations = new AnimationController();
+    private AnimationController animations = new AnimationController(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
     private HashMap<KeyCode, Boolean> keys = new HashMap<KeyCode, Boolean>();
 
     private SpriteFX gameBackground;
 
     private Player player;
-    private final double playerWidth = 90d;
-    private final double playerHeight = playerWidth / 2.28d;
 
     private final double mineWidth = 20d;
     private final double mineHeight = mineWidth * 1.34d;
-    private double mineSpawnDelay = 1.5 * FPS;
     private MovingSpriteController mineController;
 
     private final double torpedoWidth = 30d;
     private final double torpedoHeight = torpedoWidth / 2.4d;
-    private double torpedoSpawnDelay = 0.8 * FPS;
     private MovingSpriteController torpedoController;
 
     private final double intelWidth = 20d;
@@ -119,6 +114,8 @@ public class Main extends Application {
     }
 
     private void initPlayer() {
+        double playerWidth = 90d;
+        double playerHeight = playerWidth / 2.28d;
         player = new Player(GAME_WIDTH / 2d, GAME_HEIGHT / 2d, playerWidth, playerHeight);
         player.setSpeedModifier(2d);
         player.setVelocityLimit(3d);
@@ -134,11 +131,13 @@ public class Main extends Application {
 
     private void initMineController() {
         mineController = new MovingSpriteController(0, (-mineHeight), GAME_WIDTH, (GAME_HEIGHT + (2d * mineHeight)));
+        double mineSpawnDelay = 1 * FPS;
         mineController.setSpawnDelay(mineSpawnDelay);
     }
 
     private void initTorpedoController() {
         torpedoController = new MovingSpriteController((-torpedoWidth), 0, (GAME_WIDTH + (2d * torpedoWidth)), GAME_HEIGHT);
+        double torpedoSpawnDelay = 0.5 * FPS;
         torpedoController.setSpawnDelay(torpedoSpawnDelay);
     }
 
@@ -224,13 +223,14 @@ public class Main extends Application {
         handleOutOfBoundsCollision();
         handlePlayerCollision();
         handleMineTorpedoCollisions();
+        handleExplosiveZoneCollision();
     }
 
     public void handlePlayerCollision() {
         ArrayList<MovingSpriteFX> mineCollisions = mineController.checkCollisions(player, true);
         if (mineCollisions.size() > 0) {
             mineCollisions.forEach(collision -> {
-                animations.add(new AnimatedSpriteFX(collision, "/img/animations/explosion_2", 2.5, 23));
+                triggerExplosive(collision, mineController);
                 player.modifyHealth(-50);
             });
         }
@@ -238,7 +238,7 @@ public class Main extends Application {
         ArrayList<MovingSpriteFX> torpedoCollisions = torpedoController.checkCollisions(player, true);
         if (torpedoCollisions.size() > 0) {
             torpedoCollisions.forEach(collision -> {
-                animations.add(new AnimatedSpriteFX(collision, "/img/animations/explosion_2", 2.5, 23));
+                triggerExplosive(collision, torpedoController);
                 player.modifyHealth(-20);
             });
         }
@@ -289,11 +289,35 @@ public class Main extends Application {
         while (minesIterator.hasNext()) {
             MovingSpriteFX mine = minesIterator.next();
             ArrayList<MovingSpriteFX> mineCollisions = torpedoController.checkCollisions(mine, true);
-            mineCollisions.forEach(collision -> animations.add(new AnimatedSpriteFX(collision, "/img/animations/explosion_2", 2.5, 23)));
+            mineCollisions.forEach(collision -> triggerExplosive(collision, mineController));
             if (!mineCollisions.isEmpty()) {
                 minesIterator.remove();
             }
         }
+    }
+
+    private void handleExplosiveZoneCollision() {
+        animations.getArray().forEach(explosion -> {
+            mineController.getArray().forEach(mine -> {
+                if (explosion.checkCircularCollision(player, 4d)) {
+                    player.transformVelocityX(player.getCenterX() > explosion.getCenterX() ? 0.4d : -0.4d);
+                    player.transformVelocityY(player.getCenterY() > explosion.getCenterY() ? 0.4d : -0.4d);
+                }
+                if (explosion.checkCircularCollision(mine, 2.5d)) {
+                    triggerExplosive(mine, mineController);
+                }
+            });
+            torpedoController.getArray().forEach(torpedo -> {
+                if (explosion.checkCircularCollision(torpedo, 2.5)) {
+                    triggerExplosive(torpedo, torpedoController);
+                }
+            });
+        });
+    }
+
+    private void triggerExplosive(MovingSpriteFX sprite, MovingSpriteController controller) {
+        animations.add(new AnimatedSpriteFX(sprite, "/img/animations/explosion_2", 2.5d, 23));
+        controller.remove(sprite);
     }
 
     public Boolean isPressed(KeyCode key) {
@@ -347,7 +371,8 @@ public class Main extends Application {
      * Initiates the games animation timer
      */
     private void initAnimation() {
-        timer = new AnimationTimer() {
+        // Needed to avoid bug with high delta at the start of the game.
+        AnimationTimer timer = new AnimationTimer() {
 
             double timesPerTick = 1_000_000_000L / FPS;
             double deltaT = 0L;

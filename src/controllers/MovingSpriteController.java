@@ -187,6 +187,12 @@ public class MovingSpriteController {
         return getLastSpawn() + getSpawnDelay() >= currentFrame;
     }
 
+    public void remove(MovingSpriteFX sprite) {
+        if (sprites.contains(sprite)) {
+            sprites.remove(sprite);
+        }
+    }
+
     private double getRandom(double rangeMin, double rangeMax) {
         return rangeMin + (rangeMax - rangeMin) * random.nextDouble();
     }

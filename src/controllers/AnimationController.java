@@ -2,35 +2,30 @@ package controllers;
 
 import javafx.scene.canvas.GraphicsContext;
 import main.AnimatedSpriteFX;
+import main.MovingSpriteFX;
+import main.SpriteFX;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class AnimationController {
+public class AnimationController extends MovingSpriteController {
 
-    ArrayList<AnimatedSpriteFX> sprites = new ArrayList<AnimatedSpriteFX>();
-
-    public void add(AnimatedSpriteFX sprite) {
-        sprites.add(sprite);
+    public AnimationController(double minBoundX, double minBoundY, double maxBoundX, double maxBoundY) {
+        super(minBoundX, minBoundY, maxBoundX, maxBoundY);
     }
 
-    public void render(GraphicsContext gc) {
-        sprites.forEach(animatedSpriteFX -> {
-            animatedSpriteFX.drawGraphics(gc);
-        });
+    public void add(AnimatedSpriteFX sprite) {
+        super.add(sprite);
     }
 
     public void update() {
-        Iterator<AnimatedSpriteFX> spriteIterator = sprites.iterator();
+        Iterator<MovingSpriteFX> spriteIterator = super.getArray().iterator();
         while (spriteIterator.hasNext()) {
-            AnimatedSpriteFX sprite = spriteIterator.next();
+            AnimatedSpriteFX sprite = (AnimatedSpriteFX) spriteIterator.next();
             sprite.nextFrame();
             if (sprite.animationFinished()) {
                 spriteIterator.remove();
             }
         }
-    }
-
-    public void print(String msg) {
-        System.out.println(msg + sprites.size());
     }
 }

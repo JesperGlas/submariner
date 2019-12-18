@@ -130,6 +130,14 @@ public class Sprite {
         );
     }
 
+    public Boolean checkCircularCollision(Sprite sprite, double localRadiusMultiplier) {
+        return checkCircularCollision(centerX, centerY, width / 2d * localRadiusMultiplier, sprite.getCenterX(), sprite.getCenterY(), sprite.getWidth() / 2d);
+    }
+
+    public Boolean checkCircularCollision(double localCenterX, double localCenterY, double localRadius, double foreignCenterX, double foreignCenterY, double foreignRadius) {
+        return Math.abs(Math.sqrt( Math.pow((localCenterX - foreignCenterX), 2) + Math.pow((localCenterY - foreignCenterY), 2))) <= Math.abs(localRadius + foreignRadius);
+    }
+
     public void print(String msg) {
         System.out.println(msg + "sX: " + getStartX() + " sY: " + getStartY() + " eX: " + getEndX() + " eY: " + getEndY());
     }

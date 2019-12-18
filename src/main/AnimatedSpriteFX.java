@@ -2,9 +2,10 @@ package main;
 
 import javafx.scene.image.Image;
 
+import java.lang.annotation.Inherited;
 import java.util.ArrayList;
 
-public class AnimatedSpriteFX extends SpriteFX {
+public class AnimatedSpriteFX extends MovingSpriteFX {
 
     private String directoryURL;
     private ArrayList<Image> images = new ArrayList<>();
