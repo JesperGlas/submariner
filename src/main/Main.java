@@ -218,10 +218,10 @@ public class Main extends Application {
         gameUI.setScoreLabel("Data collected: " + gameUI.getScore());
         gameUI.setHealthLabel("Hull Integrity: " + player.getHealth() / 1000d * 100 + "%");
 
-        String detectionStr = player.getDetected() ? "[WARNING] Surface Detection!" : "[HIDDEN] Stealth Mode!";
+        String detectionStr = player.getDetected() ? "[DETECTED] Surface Sensors" : "[STEALTH] Surface Sensors";
         gameUI.setDetectionLabel(detectionStr);
 
-        String nukeStr = missileController.onDelay(elapsedFrames) ? "[RELOADING] missile tube" : "[READY] to launch";
+        String nukeStr = missileController.onDelay(elapsedFrames) ? "[RELOADING] Missile Bay" : "[READY] Missile Bay";
         gameUI.setNukeLabel(nukeStr);
     }
 
