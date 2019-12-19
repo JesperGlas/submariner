@@ -215,13 +215,13 @@ public class Main extends Application {
     }
 
     public void updateUI() {
-        gameUI.setScoreLabel("Intel: " + gameUI.getScore());
+        gameUI.setScoreLabel("Data collected: " + gameUI.getScore());
         gameUI.setHealthLabel("Hull Integrity: " + player.getHealth() / 1000d * 100 + "%");
 
-        String detectionStr = player.getDetected() ? "WARNING! Surface Detection!" : "HIDDEN!";
+        String detectionStr = player.getDetected() ? "[WARNING] Surface Detection!" : "[HIDDEN] Stealth Mode!";
         gameUI.setDetectionLabel(detectionStr);
 
-        String nukeStr = missileController.onDelay(elapsedFrames) ? "Reloading missile tube" : "Ready to launch";
+        String nukeStr = missileController.onDelay(elapsedFrames) ? "[RELOADING] missile tube" : "[READY] to launch";
         gameUI.setNukeLabel(nukeStr);
     }
 
@@ -238,7 +238,7 @@ public class Main extends Application {
         if (torpedoCollisions.size() > 0) {
             torpedoCollisions.forEach(collision -> {
                 triggerExplosive(collision);
-                player.modifyHealth(-20);
+                player.modifyHealth(-25);
             });
         }
 
@@ -277,37 +277,54 @@ public class Main extends Application {
         // Controllers out of bounds
         mineController.checkOutOfBounds().forEach(mine -> mineController.remove(mine));
         torpedoController.checkOutOfBounds().forEach(torpedo -> torpedoController.remove(torpedo));
+        intelController.checkOutOfBounds().forEach(intel -> intelController.remove(intel));
+        repairController.checkOutOfBounds().forEach(repair -> repairController.remove(repair));
+        missileController.checkOutOfBounds().forEach(missile -> missileController.remove(missile));
     }
 
     private void handleMineTorpedoCollisions() {
         mineController.getArray().forEach(mine -> {
-            ArrayList<MovingSpriteFX> mineCollisions = torpedoController.checkCollisions(mine, true);
-            mineCollisions.forEach(this::triggerExplosive);
-            if (!mineCollisions.isEmpty()) {
-                mine.setActive(false);
-            }
+            torpedoController.checkCollisions(mine, true).forEach(this::triggerExplosive);
+            missileController.checkCollisions(mine, true).forEach(this::triggerNuke);
+        });
+        torpedoController.getArray().forEach(torpedo -> {
+            missileController.checkCollisions(torpedo, true).forEach(this::triggerNuke);
         });
     }
 
     private void handleExplosiveZoneCollision() {
-        ArrayList<MovingSpriteFX> collidedSprites = new ArrayList<>();
+        ArrayList<MovingSpriteFX> explosiveSprites = new ArrayList<>();
+        ArrayList<MovingSpriteFX> nukeSprites = new ArrayList<>();
         animations.getArray().forEach(explosion -> {
             if (explosion.checkCircularCollision(player, 4d)) {
+                player.modifyHealth(-10d);
                 player.transformVelocityX(player.getCenterX() > explosion.getCenterX() ? 0.4d : -0.4d);
                 player.transformVelocityY(player.getCenterY() > explosion.getCenterY() ? 0.4d : -0.4d);
             }
-            mineController.getArray().stream().filter(mine -> explosion.checkCircularCollision(mine, 2.5d)).forEach(collidedSprites::add);
-            torpedoController.getArray().stream().filter(torpedo -> explosion.checkCircularCollision(torpedo, 2.5)).forEach(collidedSprites::add);
+            mineController.getArray().stream().filter(mine -> explosion.checkCircularCollision(mine, 2.5d)).forEach(explosiveSprites::add);
+            torpedoController.getArray().stream().filter(torpedo -> explosion.checkCircularCollision(torpedo, 2.5d)).forEach(explosiveSprites::add);
+            missileController.getArray().stream().filter(missile -> explosion.checkCircularCollision(missile, 5d)).forEach(nukeSprites::add);
         });
 
-        collidedSprites.forEach(collidedSprite -> {
-            triggerExplosive(collidedSprite);
-            collidedSprite.setActive(false);
+        explosiveSprites.forEach(explosiveSprite -> {
+            triggerExplosive(explosiveSprite);
+            explosiveSprite.setActive(false);
+        });
+        nukeSprites.forEach(nukeSprite -> {
+            triggerNuke(nukeSprite);
+            nukeSprite.setActive(false);
         });
     }
 
     private void triggerExplosive(MovingSpriteFX sprite) {
         animations.add(new AnimatedSpriteFX(sprite, "/img/animations/explosion_2", 2.5d, 23));
+        sprite.setActive(false);
+        soundController.play("boom");
+    }
+
+    private void triggerNuke(MovingSpriteFX sprite) {
+        animations.add(new AnimatedSpriteFX(sprite, "/img/animations/explosion_1", 7.5d, 48));
+        sprite.setActive(false);
         soundController.play("boom");
     }
 
@@ -363,6 +380,8 @@ public class Main extends Application {
         mineController.print("Mines: ");
         torpedoController.print("Torpedoes: ");
         intelController.print("Intel: ");
+        repairController.print("Repair: ");
+        missileController.print("Missile: ");
         animations.print("Animations: ");
     }
 

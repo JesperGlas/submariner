@@ -4,7 +4,54 @@
     <list default="true" id="cdb932d9-7e58-4d94-93a9-e7b232ef17da" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/submariner/main/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/submariner/main/Main.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/GameUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/GameUI.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/0.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/0.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/1.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/1.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/10.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/10.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/11.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/11.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/12.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/12.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/13.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/13.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/14.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/14.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/15.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/15.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/16.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/16.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/17.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/17.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/18.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/18.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/19.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/19.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/2.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/2.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/20.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/20.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/21.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/21.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/22.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/22.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/23.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/23.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/24.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/24.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/25.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/25.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/26.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/26.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/27.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/27.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/28.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/28.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/29.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/29.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/3.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/3.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/30.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/30.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/31.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/31.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/32.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/32.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/33.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/33.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/34.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/34.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/35.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/35.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/36.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/36.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/37.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/37.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/38.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/38.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/39.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/39.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/4.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/4.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/40.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/40.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/41.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/41.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/42.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/42.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/43.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/43.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/44.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/44.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/45.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/45.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/46.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/46.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/47.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/47.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/5.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/5.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/6.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/6.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/7.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/7.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/8.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/8.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/img/animations/explosion_1/9.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/img/animations/explosion_1/9.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/Main.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -247,22 +294,22 @@
       <screen x="47" y="27" width="1873" height="1053" />
     </state>
     <state x="766" y="296" width="424" height="507" key="FileChooserDialogImpl/47.27.1873.1053@47.27.1873.1053" timestamp="1576066407136" />
-    <state width="1827" height="175" key="GridCell.Tab.0.bottom" timestamp="1576753957253">
+    <state width="1827" height="175" key="GridCell.Tab.0.bottom" timestamp="1576768802674">
       <screen x="47" y="27" width="1873" height="1053" />
     </state>
-    <state width="1827" height="175" key="GridCell.Tab.0.bottom/47.27.1873.1053@47.27.1873.1053" timestamp="1576753957253" />
-    <state width="1827" height="175" key="GridCell.Tab.0.center" timestamp="1576753957253">
+    <state width="1827" height="175" key="GridCell.Tab.0.bottom/47.27.1873.1053@47.27.1873.1053" timestamp="1576768802674" />
+    <state width="1827" height="175" key="GridCell.Tab.0.center" timestamp="1576768802673">
       <screen x="47" y="27" width="1873" height="1053" />
     </state>
-    <state width="1827" height="175" key="GridCell.Tab.0.center/47.27.1873.1053@47.27.1873.1053" timestamp="1576753957253" />
-    <state width="1827" height="175" key="GridCell.Tab.0.left" timestamp="1576753957252">
+    <state width="1827" height="175" key="GridCell.Tab.0.center/47.27.1873.1053@47.27.1873.1053" timestamp="1576768802673" />
+    <state width="1827" height="175" key="GridCell.Tab.0.left" timestamp="1576768802673">
       <screen x="47" y="27" width="1873" height="1053" />
     </state>
-    <state width="1827" height="175" key="GridCell.Tab.0.left/47.27.1873.1053@47.27.1873.1053" timestamp="1576753957252" />
-    <state width="1827" height="175" key="GridCell.Tab.0.right" timestamp="1576753957253">
+    <state width="1827" height="175" key="GridCell.Tab.0.left/47.27.1873.1053@47.27.1873.1053" timestamp="1576768802673" />
+    <state width="1827" height="175" key="GridCell.Tab.0.right" timestamp="1576768802673">
       <screen x="47" y="27" width="1873" height="1053" />
     </state>
-    <state width="1827" height="175" key="GridCell.Tab.0.right/47.27.1873.1053@47.27.1873.1053" timestamp="1576753957253" />
+    <state width="1827" height="175" key="GridCell.Tab.0.right/47.27.1873.1053@47.27.1873.1053" timestamp="1576768802673" />
     <state width="1827" height="345" key="GridCell.Tab.1.bottom" timestamp="1576509467050">
       <screen x="47" y="27" width="1873" height="1053" />
     </state>
@@ -283,18 +330,18 @@
       <screen x="47" y="27" width="1873" height="1053" />
     </state>
     <state x="472" y="188" key="SettingsEditor/47.27.1873.1053@47.27.1873.1053" timestamp="1576066409897" />
-    <state x="639" y="381" key="com.intellij.ide.util.TipDialog" timestamp="1576658227370">
+    <state x="639" y="381" key="com.intellij.ide.util.TipDialog" timestamp="1576766601043">
       <screen x="47" y="27" width="1873" height="1053" />
     </state>
-    <state x="639" y="381" key="com.intellij.ide.util.TipDialog/47.27.1873.1053@47.27.1873.1053" timestamp="1576658227370" />
+    <state x="639" y="381" key="com.intellij.ide.util.TipDialog/47.27.1873.1053@47.27.1873.1053" timestamp="1576766601043" />
     <state x="292" y="256" width="1372" height="588" key="new project wizard" timestamp="1576608190106">
       <screen x="47" y="27" width="1873" height="1053" />
     </state>
     <state x="292" y="256" width="1372" height="588" key="new project wizard/47.27.1873.1053@47.27.1873.1053" timestamp="1576608190106" />
-    <state x="647" y="255" width="672" height="677" key="run.anything.popup" timestamp="1576586703333">
+    <state x="647" y="255" width="672" height="677" key="run.anything.popup" timestamp="1576766234818">
       <screen x="47" y="27" width="1873" height="1053" />
     </state>
-    <state x="647" y="255" width="672" height="677" key="run.anything.popup/47.27.1873.1053@47.27.1873.1053" timestamp="1576586703333" />
+    <state x="647" y="255" width="672" height="677" key="run.anything.popup/47.27.1873.1053@47.27.1873.1053" timestamp="1576766234818" />
     <state x="646" y="259" width="672" height="678" key="search.everywhere.popup" timestamp="1576271996676">
       <screen x="47" y="27" width="1873" height="1053" />
     </state>
