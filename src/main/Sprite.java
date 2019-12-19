@@ -78,6 +78,11 @@ public class Sprite {
         this.centerY = value + this.height / 2d;
     }
 
+    public void setCenterPos(double x, double y) {
+        setCenterX(x);
+        setCenterY(y);
+    }
+
     /**
      * Setter for the sprites position using its top, left corner as the starting point. The method uses the setStartX and setStartY methods.
      * @param x is the current x position of the sprites top, left corner.

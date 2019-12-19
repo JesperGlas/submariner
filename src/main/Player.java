@@ -1,6 +1,8 @@
 package main;
 
+import controllers.AnimationController;
 import controllers.MovingSpriteController;
+import javafx.scene.canvas.GraphicsContext;
 
 import java.util.ArrayList;
 
@@ -9,9 +11,11 @@ public class Player extends MovingSpriteFX {
     private double maxHealth = 1000;
     private double health = maxHealth;
     private Boolean detected = false;
+    private AnimationController launchAnimation;
 
     public Player(double startX, double startY, double width, double height) {
         super(startX, startY, width, height);
+        launchAnimation = new AnimationController(startX - width, startY - width, width * 2, height * 2);
     }
 
     public double getHealth() {
@@ -38,6 +42,21 @@ public class Player extends MovingSpriteFX {
         this.detected = detected;
     }
 
+    public void render(GraphicsContext gc) {
+        launchAnimation.render(gc);
+        super.drawGraphics(gc);
+    }
+
+    public void launch() {
+        launchAnimation.add(new AnimatedSpriteFX(this, "/img/animations/launch", 1, 16));
+    }
+
+    public void update(double delta) {
+        super.transformPos(delta);
+        launchAnimation.update();
+        launchAnimation.getArray().forEach(animation -> animation.setCenterPos(this.getCenterX(), this.getCenterY()));
+    }
+
     public void modifyHealth(double value) {
         double modifiedHealth = getHealth() + value;
         if (value < 0) {
@@ -46,6 +65,4 @@ public class Player extends MovingSpriteFX {
             setHealth(Math.min(modifiedHealth, getMaxHealth()));
         }
     }
-
-
 }

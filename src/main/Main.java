@@ -337,7 +337,9 @@ public class Main extends Application {
 
         if (isPressed(KeyCode.F) && !missileController.onDelay(elapsedFrames)) {
             MovingSpriteFX missile = new MovingSpriteFX(player.getCenterX(), player.getCenterY(), mineWidth, mineHeight, "/img/sprites/missile .png");
-            missile.setVelocityY((-1) * 6d);
+            missile.setVelocityLimit(10d);
+            missile.setVelocityY((-1) * 0.1d);
+            player.launch();
             missileController.spawn(missile, elapsedFrames);
         }
 
@@ -379,27 +381,26 @@ public class Main extends Application {
 
         movePlayer();
 
-        player.transformPos(delta);
+        player.update(delta);
 
         mineController.update(delta);
         torpedoController.update(delta);
         intelController.update(delta);
         repairController.update(delta);
         missileController.update(delta);
+        missileController.getArray().forEach(torpedo -> torpedo.transformVelocityY(-0.1d));
 
         animations.update();
     }
 
     public void render() {
         gameBackground.drawGraphics(gameGraphics);
-
         mineController.render(gameGraphics);
         torpedoController.render(gameGraphics);
         intelController.render(gameGraphics);
         repairController.render(gameGraphics);
         missileController.render(gameGraphics);
-
-        player.drawGraphics(gameGraphics);
+        player.render(gameGraphics);
         animations.render(gameGraphics);
     }
 
