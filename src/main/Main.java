@@ -38,9 +38,9 @@ public class Main extends Application {
     private Scene gameScene;
 
     private GraphicsContext gameGraphics;
+    private GameUI gameUI;
     private double delta = 1d;
     private int ticks = 0;
-    private int elapsedSeconds = 0;
     private long elapsedFrames = 0L;
 
     private AnimationController animations = new AnimationController(0, 0, GAME_WIDTH, GAME_HEIGHT);
@@ -72,11 +72,6 @@ public class Main extends Application {
     private final double missileHeight = missileWidth * 1.6d;
     private MovingSpriteController missileController;
 
-    private int score = 0;
-    private UILabel scoreLabel;
-    private UILabel healthLabel;
-    private UILabel detectionLabel;
-
     private void initScenes() throws Exception {
 
         // Menu Scene
@@ -89,10 +84,7 @@ public class Main extends Application {
         gameRoot.setMinSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 
         Canvas gameCanvas = new Canvas(GAME_WIDTH, GAME_HEIGHT);
-        GameUI gameUI = new GameUI(UI_WIDTH, UI__HEIGHT);
-        
-        // Broken off in to separate method for easier reading.
-        initUI(gameUI);
+        gameUI = new GameUI(UI_WIDTH, UI__HEIGHT);
 
         GridPane.setRowIndex(gameCanvas, 0);
         GridPane.setColumnIndex(gameCanvas, 0);
@@ -104,17 +96,11 @@ public class Main extends Application {
         gameScene = new Scene(gameRoot, WINDOW_WIDTH, WINDOW_HEIGHT);
     }
 
-    public void initUI(GameUI gameUI) {
-        scoreLabel = new UILabel("Score: " + score, UI_WIDTH, 0.8d, 10);
-        healthLabel = new UILabel("Hull Points  : 1000/1000", UI_WIDTH, 0.8d, 10);
-        detectionLabel = new UILabel("Detection: ", UI_WIDTH, 0.8d, 10);
-        gameUI.getChildren().addAll(scoreLabel, healthLabel, detectionLabel);
-    }
-
     private void initSound() {
         soundController.addMedia("boom", "/sounds/boom.mp3");
         soundController.addMedia("intel", "/sounds/intel.mp3");
         soundController.addMedia("repair", "/sounds/repair.mp3");
+        soundController.addMedia("launch", "/sounds/launch.mp3");
     }
 
     public void initBackground() {
@@ -131,7 +117,6 @@ public class Main extends Application {
         player.setSpeedModifier(2d);
         player.setVelocityLimit(3d);
         player.setImgUrl("/img/sprites/uboat.png");
-        healthLabel.setText("Hull Points: " + player.getHealth() + "/1000");
     }
 
     private void initSurfaceDetectionZone() {
@@ -165,7 +150,7 @@ public class Main extends Application {
     }
 
     private void initMissileController() {
-        final int delayFrames = 2 * FPS;
+        final int delayFrames = 5 * FPS;
         missileController = new MovingSpriteController(0, (-missileHeight), GAME_WIDTH, (GAME_HEIGHT + (2d * missileHeight)));
         missileController.setSpawnDelay(delayFrames);
     }
@@ -205,7 +190,6 @@ public class Main extends Application {
                 }
 
                 if (timer >= 1_000_000_000L) {
-                    elapsedSeconds++;
                     printInfo();
                     ticks = 0;
                     timer = 0L;
@@ -218,6 +202,7 @@ public class Main extends Application {
     private void initGameResources() throws Exception {
         initScenes();
         initSound();
+        gameUI.init();
         initBackground();
         initPlayer();
         initSurfaceDetectionZone();
@@ -227,6 +212,17 @@ public class Main extends Application {
         initRepairController();
         initMissileController();
         initAnimation();
+    }
+
+    public void updateUI() {
+        gameUI.setScoreLabel("Intel: " + gameUI.getScore());
+        gameUI.setHealthLabel("Hull Integrity: " + player.getHealth() / 1000d * 100 + "%");
+
+        String detectionStr = player.getDetected() ? "WARNING! Surface Detection!" : "HIDDEN!";
+        gameUI.setDetectionLabel(detectionStr);
+
+        String nukeStr = missileController.onDelay(elapsedFrames) ? "Reloading missile tube" : "Ready to launch";
+        gameUI.setNukeLabel(nukeStr);
     }
 
     public void handlePlayerCollision() {
@@ -248,7 +244,7 @@ public class Main extends Application {
 
         ArrayList<MovingSpriteFX> intelCollisions = intelController.checkCollisions(player, true);
         if (intelCollisions.size() > 0) {
-            score += intelCollisions.size();
+            gameUI.setScore(gameUI.getScore() + intelCollisions.size());
             soundController.play("intel");
         }
 
@@ -258,13 +254,8 @@ public class Main extends Application {
             soundController.play("repair");
         }
 
+        // Check if the player is in the detection zone
         player.setDetected(surfaceDetectionZone.checkCollision(player));
-
-        scoreLabel.setText("Score: " + score);
-        healthLabel.setText("Hull Points: " + player.getHealth() + "/1000");
-
-        String detectionStr = player.getDetected() ? "WARNING! Surface Detection!" : "HIDDEN!";
-        detectionLabel.setText(detectionStr);
     }
 
     private void handleOutOfBoundsCollision() {
@@ -340,6 +331,7 @@ public class Main extends Application {
             missile.setVelocityLimit(10d);
             missile.setVelocityY((-1) * 0.1d);
             player.launch();
+            soundController.play("launch");
             missileController.spawn(missile, elapsedFrames);
         }
 
@@ -366,7 +358,6 @@ public class Main extends Application {
 
     public void printInfo() {
         System.out.println("Ticks and Frames: " + ticks);
-        System.out.println("Score: " + score);
         System.out.println("Delta: " + delta);
         player.print("Player: ");
         mineController.print("Mines: ");
@@ -376,6 +367,7 @@ public class Main extends Application {
     }
 
     public void update() {
+        updateUI();
         gameScene.setOnKeyPressed(keyEvent -> keys.put(keyEvent.getCode(), true));
         gameScene.setOnKeyReleased(keyEvent -> keys.put(keyEvent.getCode(), false));
 
