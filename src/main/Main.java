@@ -42,6 +42,7 @@ public class Main extends Application {
     private double delta = 1d;
     private int ticks = 0;
     private long elapsedFrames = 0L;
+    private Boolean running = true;
 
     private AnimationController animations = new AnimationController(0, 0, GAME_WIDTH, GAME_HEIGHT);
     private SoundController soundController = new SoundController();
@@ -50,7 +51,8 @@ public class Main extends Application {
 
     private SpriteFX gameBackground;
     private Player player;
-    private final Sprite surfaceDetectionZone = new SpriteFX(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    private final Sprite surfaceDetectionZone = new Sprite(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    private final Sprite crushDepthZone = new Sprite(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
     private final double mineWidth = 20d;
     private final double mineHeight = mineWidth * 1.34d;
@@ -119,10 +121,12 @@ public class Main extends Application {
         player.setImgUrl("/img/sprites/uboat.png");
     }
 
-    private void initSurfaceDetectionZone() {
-        surfaceDetectionZone.setWidth(GAME_WIDTH);
-        surfaceDetectionZone.setHeight(GAME_HEIGHT / 2d);
+    private void initPermanentCollisionZones() {
         surfaceDetectionZone.setStartPos(0, 0);
+        surfaceDetectionZone.setHeight(GAME_HEIGHT / 2d);
+
+        crushDepthZone.setHeight(GAME_HEIGHT / 4d);
+        crushDepthZone.setStartPos(0, GAME_HEIGHT - crushDepthZone.getHeight());
     }
 
     private void initMineController() {
@@ -179,10 +183,12 @@ public class Main extends Application {
                     // Needed to avoid bug with high delta at the start of the game.
                     delta = deltaT <= 10 ? deltaT : delta;
 
-                    update();
-                    spawn();
-                    collision();
-                    render();
+                    if (running) {
+                        update();
+                        spawn();
+                        collision();
+                        render();
+                    }
 
                     ticks++;
                     elapsedFrames++;
@@ -205,7 +211,7 @@ public class Main extends Application {
         gameUI.init();
         initBackground();
         initPlayer();
-        initSurfaceDetectionZone();
+        initPermanentCollisionZones();
         initMineController();
         initTorpedoController();
         initIntelController();
@@ -256,6 +262,8 @@ public class Main extends Application {
 
         // Check if the player is in the detection zone
         player.setDetected(surfaceDetectionZone.checkCollision(player));
+
+        gameUI.setDepthLabel(player.checkCollision(crushDepthZone) ? "[CRITICAL HULL PRESSURE]" : "[SAFE HULL PRESSURE]");
     }
 
     private void handleOutOfBoundsCollision() {
@@ -279,7 +287,10 @@ public class Main extends Application {
         torpedoController.checkOutOfBounds().forEach(torpedo -> torpedoController.remove(torpedo));
         intelController.checkOutOfBounds().forEach(intel -> intelController.remove(intel));
         repairController.checkOutOfBounds().forEach(repair -> repairController.remove(repair));
-        missileController.checkOutOfBounds().forEach(missile -> missileController.remove(missile));
+        missileController.checkOutOfBounds().forEach(missile -> {
+            missileController.remove(missile);
+            gameUI.setScore(gameUI.getScore() + 10);
+        });
     }
 
     private void handleMineTorpedoCollisions() {
@@ -402,6 +413,10 @@ public class Main extends Application {
         missileController.getArray().forEach(torpedo -> torpedo.transformVelocityY(-0.1d));
 
         animations.update();
+
+        if (player.getHealth() <= 0) {
+            running = false;
+        }
     }
 
     public void render() {
@@ -413,6 +428,11 @@ public class Main extends Application {
         missileController.render(gameGraphics);
         player.render(gameGraphics);
         animations.render(gameGraphics);
+
+        if (running == false) {
+            gameGraphics.setFill(Color.WHITE);
+            gameGraphics.fillText("[GAME OVER COMRADE] Final Score: " + gameUI.getScore(), GAME_WIDTH / 2d, GAME_HEIGHT / 2d);
+        }
     }
 
     public void spawn() {

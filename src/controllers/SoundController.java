@@ -3,8 +3,6 @@ package controllers;
 import java.util.HashMap;
 
 import javafx.scene.media.AudioClip;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 
 public class SoundController {
 

@@ -19,6 +19,7 @@ public class GameUI extends VBox {
     private UILabel healthLabel;
     private UILabel detectionLabel;
     private UILabel nukeLabel;
+    private UILabel depthLabel;
 
     public GameUI(double width, double height) {
         this.width = width;
@@ -37,7 +38,14 @@ public class GameUI extends VBox {
         healthLabel = new UILabel("Hull Points  : 1000/1000", width, 0.8d, 10);
         detectionLabel = new UILabel("Detection: ", width, 0.8d, 10);
         nukeLabel = new UILabel("Missile Tube: ", width, 0.8d, 10);
-        this.getChildren().addAll(scoreLabel, healthLabel, detectionLabel, nukeLabel);
+        depthLabel = new UILabel("Depth: ", width, 0.8d, 10);
+        this.getChildren().addAll(
+                scoreLabel,
+                healthLabel,
+                detectionLabel,
+                nukeLabel,
+                depthLabel
+        );
     }
 
     public void add(Node node) {
@@ -70,5 +78,8 @@ public class GameUI extends VBox {
 
     public void setNukeLabel(String str) {
         nukeLabel.setText(str);
+    }
+    public void setDepthLabel(String str) {
+        depthLabel.setText(str);
     }
 }
