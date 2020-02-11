@@ -23,37 +23,47 @@ import java.util.Iterator;
 
 public class Main extends Application {
 
+    // Window size variables
     private final double WINDOW_WIDTH = 1800d;
     private final double WINDOW_HEIGHT = 1000d;
 
+    // UI size variables
     private final double UI_WIDTH = 300d;
     private final double UI__HEIGHT = WINDOW_HEIGHT;
 
+    // Game size variables
     private final double GAME_WIDTH = WINDOW_WIDTH - UI_WIDTH;
     private final double GAME_HEIGHT = WINDOW_HEIGHT;
 
+    // The games FPS
     private final int FPS = 30;
 
+    // Visual variables
     private Scene startMenuScene;
     private Scene gameScene;
-
     private GraphicsContext gameGraphics;
     private GameUI gameUI;
+
+    // Time variables
     private double delta = 1d;
     private int ticks = 0;
     private long elapsedFrames = 0L;
     private Boolean running = true;
 
+    // Custom controllers
     private AnimationController animations = new AnimationController(0, 0, GAME_WIDTH, GAME_HEIGHT);
     private SoundController soundController = new SoundController();
 
+    // Hashmap for user inputs
     private HashMap<KeyCode, Boolean> keys = new HashMap<KeyCode, Boolean>();
 
+    // Global game objects
     private SpriteFX gameBackground;
     private Player player;
     private final Sprite surfaceDetectionZone = new Sprite(0, 0, GAME_WIDTH, GAME_HEIGHT);
     private final Sprite crushDepthZone = new Sprite(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
+    // Automated sprite variables
     private final double mineWidth = 20d;
     private final double mineHeight = mineWidth * 1.34d;
     private MovingSpriteController mineController;
@@ -74,6 +84,10 @@ public class Main extends Application {
     private final double missileHeight = missileWidth * 1.6d;
     private MovingSpriteController missileController;
 
+    /**
+     * A function to initialize the scenes
+     * @throws Exception
+     */
     private void initScenes() throws Exception {
 
         // Menu Scene
@@ -98,6 +112,9 @@ public class Main extends Application {
         gameScene = new Scene(gameRoot, WINDOW_WIDTH, WINDOW_HEIGHT);
     }
 
+    /**
+     * Function to initialize the games audio
+     */
     private void initSound() {
         soundController.addMedia("boom", "/sounds/boom.mp3");
         soundController.addMedia("intel", "/sounds/intel.mp3");
@@ -105,6 +122,9 @@ public class Main extends Application {
         soundController.addMedia("launch", "/sounds/launch.mp3");
     }
 
+    /**
+     * Function to initialize the games background sprite
+     */
     public void initBackground() {
         gameBackground = new SpriteFX(0, 0, GAME_WIDTH, GAME_HEIGHT);
         gameBackground.setStartPos(0, 0);
@@ -112,6 +132,9 @@ public class Main extends Application {
         gameBackground.drawGraphics(gameGraphics);
     }
 
+    /**
+     * Function to initialize the player sprite
+     */
     private void initPlayer() {
         double playerWidth = 90d;
         double playerHeight = playerWidth / 2.28d;
@@ -121,6 +144,9 @@ public class Main extends Application {
         player.setImgUrl("/img/sprites/uboat.png");
     }
 
+    /**
+     * Function to initialize permanent zones of collision, these uses the sprite class for collision
+     */
     private void initPermanentCollisionZones() {
         surfaceDetectionZone.setStartPos(0, 0);
         surfaceDetectionZone.setHeight(GAME_HEIGHT / 2d);
@@ -129,30 +155,45 @@ public class Main extends Application {
         crushDepthZone.setStartPos(0, GAME_HEIGHT - crushDepthZone.getHeight());
     }
 
+    /**
+     * Function to initialize the controller for the mines
+     */
     private void initMineController() {
         mineController = new MovingSpriteController(0, (-mineHeight), GAME_WIDTH, (GAME_HEIGHT + (2d * mineHeight)));
         double mineSpawnDelay = 1 * FPS;
         mineController.setSpawnDelay(mineSpawnDelay);
     }
 
+    /**
+     * Function to initialize the controller for the torpedoes
+     */
     private void initTorpedoController() {
         torpedoController = new MovingSpriteController((-torpedoWidth), 0, (GAME_WIDTH + (2d * torpedoWidth)), GAME_HEIGHT);
         double torpedoSpawnDelay = 0.5 * FPS;
         torpedoController.setSpawnDelay(torpedoSpawnDelay);
     }
 
+    /**
+     * Function to initialize the controller for the intel packages
+     */
     private void initIntelController() {
         final int delayFrames = 5 * FPS;
         intelController = new MovingSpriteController(0, (-intelHeight), GAME_WIDTH, (GAME_HEIGHT + (2d * intelHeight)));
         intelController.setSpawnDelay(delayFrames);
     }
 
+    /**
+     * Function to initialize the controller for the repair packages
+     */
     private void initRepairController() {
         final int delayFrames = 10 * FPS;
         repairController = new MovingSpriteController(0, (-repairHeight), GAME_WIDTH, (GAME_HEIGHT + (2d * repairHeight)));
         repairController.setSpawnDelay(delayFrames);
     }
 
+    /**
+     * Function to initialize the controller for the missiles
+     */
     private void initMissileController() {
         final int delayFrames = 5 * FPS;
         missileController = new MovingSpriteController(0, (-missileHeight), GAME_WIDTH, (GAME_HEIGHT + (2d * missileHeight)));
@@ -160,7 +201,7 @@ public class Main extends Application {
     }
 
     /**
-     * Initiates the games animation timer
+     * Function to initialize the games animation timer
      */
     private void initAnimation() {
         // Needed to avoid bug with high delta at the start of the game.
@@ -205,6 +246,10 @@ public class Main extends Application {
         timer.start();
     }
 
+    /**
+     * A function which runs all the init functions for the games resources in the correct order
+     * @throws Exception
+     */
     private void initGameResources() throws Exception {
         initScenes();
         initSound();
@@ -220,6 +265,9 @@ public class Main extends Application {
         initAnimation();
     }
 
+    /**
+     * Function which updates the games UI variables
+     */
     public void updateUI() {
         gameUI.setScoreLabel("Data collected: " + gameUI.getScore());
         gameUI.setHealthLabel("Hull Integrity: " + player.getHealth() / 1000d * 100 + "%");
@@ -231,6 +279,9 @@ public class Main extends Application {
         gameUI.setNukeLabel(nukeStr);
     }
 
+    /**
+     * Function which handles all of the player sprites collisions
+     */
     public void handlePlayerCollision() {
         ArrayList<MovingSpriteFX> mineCollisions = mineController.checkCollisions(player, true);
         if (mineCollisions.size() > 0) {
@@ -250,13 +301,13 @@ public class Main extends Application {
 
         ArrayList<MovingSpriteFX> intelCollisions = intelController.checkCollisions(player, true);
         if (intelCollisions.size() > 0) {
-            gameUI.setScore(gameUI.getScore() + intelCollisions.size());
+            gameUI.setScore(gameUI.getScore() + intelCollisions.size() * 2);
             soundController.play("intel");
         }
 
         ArrayList<MovingSpriteFX> repairCollisions = repairController.checkCollisions(player, true);
         if (repairCollisions.size() > 0) {
-            player.modifyHealth(25);
+            player.modifyHealth(50);
             soundController.play("repair");
         }
 
@@ -266,6 +317,9 @@ public class Main extends Application {
         gameUI.setDepthLabel(player.checkCollision(crushDepthZone) ? "[CRITICAL HULL PRESSURE]" : "[SAFE HULL PRESSURE]");
     }
 
+    /**
+     * Function which handles sprites out of bound collisions
+     */
     private void handleOutOfBoundsCollision() {
         // Player out of bounds
         if (player.getStartX() <= 0 && player.getVelocityX() < 0) {
@@ -293,6 +347,9 @@ public class Main extends Application {
         });
     }
 
+    /**
+     * Function which handles the collisions between mines and torpedoes
+     */
     private void handleMineTorpedoCollisions() {
         mineController.getArray().forEach(mine -> {
             torpedoController.checkCollisions(mine, true).forEach(this::triggerExplosive);
@@ -303,10 +360,17 @@ public class Main extends Application {
         });
     }
 
+    /**
+     * Function which handles the collisions between sprites and the explosive zones some create on collision
+     */
     private void handleExplosiveZoneCollision() {
+        // Different arrays are used for regular explosions and nukes.
         ArrayList<MovingSpriteFX> explosiveSprites = new ArrayList<>();
         ArrayList<MovingSpriteFX> nukeSprites = new ArrayList<>();
+
+        // Each explosion is checked individually with the player and the relevant moving game sprites
         animations.getArray().forEach(explosion -> {
+            // If the player collides with an explosive zone the health and movement is affected
             if (explosion.checkCircularCollision(player, 4d)) {
                 player.modifyHealth(-10d);
                 player.transformVelocityX(player.getCenterX() > explosion.getCenterX() ? 0.4d : -0.4d);
@@ -317,6 +381,7 @@ public class Main extends Application {
             missileController.getArray().stream().filter(missile -> explosion.checkCircularCollision(missile, 5d)).forEach(nukeSprites::add);
         });
 
+        // Each element in the arrays are triggered in the correct way
         explosiveSprites.forEach(explosiveSprite -> {
             triggerExplosive(explosiveSprite);
             explosiveSprite.setActive(false);
@@ -470,7 +535,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        primaryStage.setTitle("Submariner");
+        primaryStage.setTitle("uBoat");
         initGameResources();
         primaryStage.setScene(gameScene);
         primaryStage.show();
